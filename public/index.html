@@ -4,10 +4,20 @@
   <meta charset="UTF-8">
   <title>SocketIOチャット</title>
   <link rel="stylesheet" href="style.css" type="text/css" media="all">
+  <script src="https://www.google.com/recaptcha/api.js"></script>
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script>
+  function validateRecaptcha ( code ) {
+    if ( !!code ) {
+      var form = document.querySelector(".recaptcha");
+      form.removeAttribute('disabled');
+    }
+  }
+</script>
 </head>
 <body>
 
-<h1>SocketIOチャット</h1>
+<h1>チャット</h1>
 
 <!-- STEP1. 接続中 -->
 <section id="nowconnecting">
@@ -20,7 +30,12 @@
   <p>あなたの名前を入力してください</p>
   <form id="frm-myname" autocomplete="off">
     <input type="text" id="txt-myname">
-    <button>入室</button>
+    <div class="g-recaptcha" data-callback="validateRecaptcha" data-sitekey="XXXXXXXXXXXX"></div>
+
+    <!-- <button>入室</button> -->
+    <!-- <input type="submit" name="button" value="送信" disabled> -->
+    <input type="password" id="p" name="password" placeholder=パスワードを入力>
+    <input type="submit" name="ACMS_POST_Form_Submit" value="送信する" id="btnSubmit" class="recaptcha btn-attention-block-large" disabled />
   </form>
 </section>
 <!-- /名前を入力 -->
@@ -47,7 +62,6 @@
   </form>
 </section>
 <!-- /チャット本体 -->
-
 <script src="/socket.io/socket.io.js"></script>
 <script src="util.js"></script>
 <script src="app.js"></script>
