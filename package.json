@@ -1,0 +1,23 @@
+{
+  "name": "socketio-chat",
+  "version": "1.0.0",
+  "description": "コミュニケーションの難しさを緩和するためのチャットツールです。 ## 実行方法 ``` $ git clone https://github.com/world779/chat_tool $ cd chat_tool $ npm install ```",
+  "main": "serve.js",
+  "dependencies": {
+    "socket.io": "^2.3.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/world779/chat_tool.git.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/world779/chat_tool.git/issues"
+  },
+  "homepage": "https://github.com/world779/chat_tool.git#readme"
+}
