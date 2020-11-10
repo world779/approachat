@@ -4,6 +4,7 @@
   "description": "コミュニケーションの難しさを緩和するためのチャットツールです。 ## 実行方法 ``` $ git clone https://github.com/world779/chat_tool $ cd chat_tool $ npm install ```",
   "main": "serve.js",
   "dependencies": {
+    "express": "^4.17.1",
     "socket.io": "^2.3.0"
   },
   "devDependencies": {},

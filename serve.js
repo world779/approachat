@@ -1,20 +1,18 @@
-// S01. 必要なモジュールを読み込む
-var http = require("http");
-var socketio = require("socket.io");
-var fs = require("fs");
-// S02. HTTPサーバを生成する
-var server = http
-  .createServer(function (req, res) {
-    res.writeHead(200, { "Content-Type": "text/html" });
-    res.end(fs.readFileSync(__dirname + "/index.html", "utf-8"));
-  })
-  .listen(3000); // ポート競合の場合は値を変更
+const app  = require("express")();
+const http = require("http").Server(app);
+const io = require("socket.io")(http);
+const DOCUMENT_ROOT = __dirname + "/public";
 
-// S03. HTTPサーバにソケットをひも付ける（WebSocket有効化）
-var io = socketio.listen(server);
+app.get("/", (req, res)=>{
+  res.sendFile(DOCUMENT_ROOT + "/index.html");
+});
+app.get("/:file", (req, res)=>{
+  res.sendFile(DOCUMENT_ROOT + "/" + req.params.file);
+});
 
 // S04. connectionイベントを受信する
-io.sockets.on("connection", function (socket) {
+io.on("connection", function (socket) {
+
   var room = "";
   var name = "";
 
@@ -49,3 +47,7 @@ io.sockets.on("connection", function (socket) {
     }
   });
 });
+
+http.listen(3000, function(){
+    console.log("listening on *:3000");
+})
