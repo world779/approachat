@@ -33,6 +33,8 @@ $("form").submit(function (e) {
 
 function changeLabel() {
     $(".nameLabel").text("メッセージ：");
+    $(".passLabel").remove();
+    $(".form-pass").remove();
     $("#rooms").prop("disabled", true);
     $("button").text("送信");
     isEnter = true;

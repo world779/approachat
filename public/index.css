@@ -1,0 +1,40 @@
+html, body { height: 100%; }
+
+body{
+	background-image: url(4012693_l.jpg);
+	color: white;
+	width: 100%;
+}
+
+.main-visual{
+	height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.main-visual h1{
+	margin-bottom: 30px;
+}
+
+.form-control{
+	width: 300px;
+	margin: 0 auto;
+	margin-bottom: 20px;
+}
+
+.g-recaptcha{
+	margin-right:auto;
+    margin-left:auto;
+    text-align: center;
+    width:300px;
+    margin-top:40px;
+}
+
+.btn-margin{
+	margin-top: 20px;
+}
+
+#chatLogs{
+	margin-top: 70px;
+}

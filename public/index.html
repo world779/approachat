@@ -7,25 +7,43 @@
       rel="stylesheet"
       href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"
     />
+    <link
+      rel="stylesheet"
+      href="./index.css"
+    />
+    <script src="https://www.google.com/recaptcha/api.js"></script>
+    <script>
+      function validateRecaptcha ( code ) {
+        if ( !!code ) {
+          var form = document.querySelector(".recaptcha");
+          form.removeAttribute('disabled');
+        }
+      }
+    </script>
   </head>
   <body>
+    <div class="main-visual text-center">
     <div class="container">
-      <h1>WebSocket-Chat</h1>
-      <form class="form-inline">
+      <h1>Chat</h1>
+      <form class="justify-content-center">
         <div class="form-group">
-          <label class="roomLabel" for="rooms">部屋：</label>
+          <label class="roomLabel" for="rooms">部屋</label>
           <select class="form-control" id="rooms">
             <option value="room01">部屋01</option>
             <option value="room02">部屋02</option>
           </select>
-          <label class="nameLabel" for="msgForm">名前：</label>
+          <label class="nameLabel" for="msgForm">名前</label>
           <input type="text" class="form-control" id="msgForm" />
+          <label class="passLabel" for="msgForm">パスワード</label>
+          <input type="password" class="form-control form-pass" id="msgForm" size="30" maxlength="30">
+          <div class="g-recaptcha recaptcha" data-callback="validateRecaptcha" data-sitekey=""></div>
         </div>
-        <button type="submit" class="btn btn-primary" id="sendButton">
+        <button type="submit" class="btn btn-success btn-lg btn-margin" id="sendButton">
           入室
         </button>
       </form>
       <div id="chatLogs"></div>
+    </div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
