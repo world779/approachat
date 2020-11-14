@@ -3,9 +3,10 @@ var isEnter = false;
 var name = "";
 
 // C04. server_to_clientイベント・データを受信する
-socket.on("server_to_client", function (data) {
+socket.on("server_to_client_join", function (data) {
     appendMsg(data.value);
 });
+
 function appendMsg(text) {
     $("#chatLogs").append("<div>" + text + "</div>");
 }
@@ -17,7 +18,7 @@ $("form").submit(function (e) {
     if (isEnter) {
         message = "[" + name + "]: " + message;
         // C03. client_to_serverイベント・データを送信する
-        socket.emit("client_to_server", { value: message });
+        socket.emit("msg", { value: message });
     } else {
         name = message;
         var entryMessage = name + "さんが入室しました。";

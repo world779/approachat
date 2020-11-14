@@ -1,0 +1,13 @@
+#field {
+  width: 400px;
+  height: 200px;
+  border: 1px solid gray;
+}
+
+#chatLogs {
+  float: right;
+  width: 25vw;
+  height: 100vh;
+  border: 1px solid gray;
+  word-wrap: break-word;
+}
