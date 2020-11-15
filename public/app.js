@@ -12,6 +12,7 @@ socket.on("s2c_msg", function (data) {
 
 socket.on("s2c_leave", function(data) {
   appendMsg(data.msg);
+  $(`#${data.id}`).remove();
 });
 
 socket.on("token", function(data){
@@ -21,11 +22,10 @@ socket.on("token", function(data){
 socket.on("initial_data", function(data) {
   Object.keys(data.data).forEach(function(key) {
     member = this[key];
-    console.log(key);
+    console.log(member.count);
     if(member.room == room){
       appendAvatar(member.count);
-      moveAvatar(member.id, member.x, member.y);
-      console.log("append");
+      moveAvatar(member.count, member.x, member.y);
     }
   }, data.data);
 });
@@ -33,7 +33,6 @@ socket.on("initial_data", function(data) {
 socket.on("s2c_join", function(data){
   appendMsg(data.msg);
   appendAvatar(data.id);
-  console.log("appendjoin");
 });
 
 socket.on("s2c_move", function(data){
@@ -66,7 +65,7 @@ $("form").submit(function (e) {
 
 $("#field").click(function(e){
   console.log(e);
-  socket.emit("c2s_move", { token:token, x:e.clientX, y:e.clientY });
+  socket.emit("c2s_move", { token:token, x:e.offsetX , y:e.offsetY });
 });
 
 function changeLabel() {
