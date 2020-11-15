@@ -84,5 +84,5 @@ function moveAvatar(id, x, y){
     translateX: x,
     translateY: y,
     easing: 'linear'
-  })
+  });
 }

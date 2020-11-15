@@ -4,6 +4,7 @@ const http = require("http").Server(app);
 const io = require("socket.io")(http);
 const crypto = require("crypto");
 const DOCUMENT_ROOT = __dirname + "/public";
+const MIN_DIST = 1000;
 //デプロイ時は変更の上環境変数にして削除
 const SECRET_TOKEN = "abcdefghijklmn12345";
 
@@ -37,11 +38,12 @@ io.on("connection", function (socket) {
   // ルームに入室されたらsocketをroomにjoinさせてメンバーリストにもそれを反映
   socket.on("c2s_join", function (data) {
     if(data.token == TOKENS[socket.id]){
-      io.to(socket.id).emit("initial_data", { data: MEMBER });
       MEMBER[socket.id].name = data.name;
       MEMBER[socket.id].room = data.room;
       socket.join(data.room);
       var msg = MEMBER[socket.id].name + "さんが入室しました。";
+      console.log(MEMBER);
+      io.to(socket.id).emit("initial_data", { data: MEMBER });
       io.to(MEMBER[socket.id].room).emit("s2c_join", { id: MEMBER[socket.id].count, msg: msg });
     }
   });
@@ -49,8 +51,14 @@ io.on("connection", function (socket) {
   socket.on("c2s_msg", function (data) {
     // S06. server_to_clientイベント・データを送信する
     if(TOKENS[socket.id] == data.token){
-      var msg = MEMBER[socket.id].name + ": " + data.msg;
-      io.to(MEMBER[socket.id].room).emit("s2c_msg", { msg: msg });
+      var sender = MEMBER[socket.id];
+      var msg = sender.name + ": " + data.msg;
+      Object.keys(MEMBER).forEach(function(key) {
+        var member = MEMBER[key];
+        var dist = calcDist(member.x, member.y, sender.x, sender.y);
+        console.log(dist);
+        if(dist<MIN_DIST)io.to(key).emit("s2c_msg", { msg: msg });
+      }, MEMBER);
     }
   });
 
@@ -73,6 +81,10 @@ io.on("connection", function (socket) {
     delete MEMBER[socket.id];
   });
 });
+
+function calcDist(x1, y1, x2, y2){
+  return Math.sqrt((x1-x2) * (x1-x2) + (y1-y2) * (y1-y2));
+}
 
 http.listen(3000, function(){
     console.log("listening on *:3000");
