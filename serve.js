@@ -8,6 +8,7 @@ const DOCUMENT_ROOT = __dirname + "/public";
 const SECRET_TOKEN = "abcdefghijklmn12345";
 
 const MEMBER = {};
+const TOKENS = {};
 let MEMBER_COUNT = 1;
 
 app.get("/", (req, res)=>{
@@ -20,50 +21,56 @@ app.use("/animejs", express.static(__dirname + "/node_modules/animejs/lib/"));
 // S04. connectionイベントを受信する
 io.on("connection", function (socket) {
 
-  var room = "";
-  var name = "";
-
     (()=>{
     // トークンを作成
     const token = crypto.createHash("sha1").update(SECRET_TOKEN + socket.id).digest('hex');
 
     // ユーザーリストに追加
-    MEMBER[socket.id] = {token: token, name:null, count:MEMBER_COUNT};
+    MEMBER[socket.id] = {name:null, room:null, count:MEMBER_COUNT, x: 0, y: 0};
+    TOKENS[socket.id] = token;
     MEMBER_COUNT++;
 
     // 本人にトークンを送付
-    io.to(socket.id).emit("token", {token:token});
+    io.to(socket.id).emit("token", {token: token});
   })();
 
-  // roomへの入室は、「socket.join(room名)」
-  socket.on("join", function (data) {
-    room = data.value;
-    socket.join(room);
+  // ルームに入室されたらsocketをroomにjoinさせてメンバーリストにもそれを反映
+  socket.on("c2s_join", function (data) {
+    if(data.token == TOKENS[socket.id]){
+      io.to(socket.id).emit("initial_data", { data: MEMBER });
+      MEMBER[socket.id].name = data.name;
+      MEMBER[socket.id].room = data.room;
+      socket.join(data.room);
+      var msg = MEMBER[socket.id].name + "さんが入室しました。";
+      io.to(MEMBER[socket.id].room).emit("s2c_join", { id: MEMBER[socket.id].count, msg: msg });
+    }
   });
-  // S05. client_to_serverイベント・データを受信する
-  socket.on("msg", function (data) {
+  // メッセージがきたら名前とメッセージをくっつけて送り返す
+  socket.on("c2s_msg", function (data) {
     // S06. server_to_clientイベント・データを送信する
-    io.to(room).emit("server_to_client", { value: data.value });
+    if(TOKENS[socket.id] == data.token){
+      var msg = MEMBER[socket.id].name + ": " + data.msg;
+      io.to(MEMBER[socket.id].room).emit("s2c_msg", { msg: msg });
+    }
   });
-  // S07. client_to_server_broadcastイベント・データを受信し、送信元以外に送信する
-  socket.on("client_to_server_broadcast", function (data) {
-    socket.broadcast.to(room).emit("server_to_client", { value: data.value });
+
+  socket.on("c2s_move", function(data){
+    if(TOKENS[socket.id] == data.token){
+      MEMBER[socket.id].x = data.x;
+      MEMBER[socket.id].y = data.y;
+      io.to(MEMBER[socket.id].room).emit("s2c_move", { id: MEMBER[socket.id].count, x:MEMBER[socket.id].x, y:MEMBER[socket.id].y });
+    }
   });
-  // S08. client_to_server_personalイベント・データを受信し、送信元のみに送信する
-  socket.on("client_to_server_personal", function (data) {
-    var id = socket.id;
-    name = data.value;
-    var personalMessage = "あなたは、" + name + "さんとして入室しました。";
-    io.to(id).emit("server_to_client", { value: personalMessage });
-  });
+
   // S09. dicconnectイベントを受信し、退出メッセージを送信する
   socket.on("disconnect", function () {
-    if (name == "") {
+    if (MEMBER[socket.id].name == null) {
       console.log("未入室のまま、どこかへ去っていきました。");
     } else {
-      var endMessage = name + "さんが退出しました。";
-      io.to(room).emit("server_to_client", { value: endMessage });
+      var msg = MEMBER[socket.id].name + "さんが退出しました。";
+      io.to(MEMBER[socket.id].room).emit("s2c_leave", { id:MEMBER[socket.id].count, msg: msg });
     }
+    delete MEMBER[socket.id];
   });
 });
 

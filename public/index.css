@@ -42,3 +42,15 @@ body{
 #conteiner-form{
     height:100vh;
 }
+
+#field{
+    border: 3px solid;
+    width: 100vw;
+    height: 100vh;
+}
+
+.avatar{
+    width: 5vw;
+    height: 5vw;
+    border: 3px solid;
+}
