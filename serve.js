@@ -32,32 +32,34 @@ io.on("connection", function (socket) {
     MEMBER_COUNT++;
 
     // 本人にトークンを送付
-    io.to(socket.id).emit("token", {token: token});
+    io.to(socket.id).emit("token", { token: token, id:MEMBER[socket.id].count });
   })();
 
   // ルームに入室されたらsocketをroomにjoinさせてメンバーリストにもそれを反映
   socket.on("c2s_join", function (data) {
     if(data.token == TOKENS[socket.id]){
+      io.to(socket.id).emit("initial_data", { data: MEMBER });
+      console.log(MEMBER);
       MEMBER[socket.id].name = data.name;
       MEMBER[socket.id].room = data.room;
       socket.join(data.room);
       var msg = MEMBER[socket.id].name + "さんが入室しました。";
       console.log(MEMBER);
-      io.to(socket.id).emit("initial_data", { data: MEMBER });
-      io.to(MEMBER[socket.id].room).emit("s2c_join", { id: MEMBER[socket.id].count, msg: msg });
+      io.to(MEMBER[socket.id].room).emit("s2c_join", { id: MEMBER[socket.id].count, name: MEMBER[socket.id].name, msg: msg });
     }
   });
   // メッセージがきたら名前とメッセージをくっつけて送り返す
   socket.on("c2s_msg", function (data) {
     // S06. server_to_clientイベント・データを送信する
+    var minDist = data.dist;
     if(TOKENS[socket.id] == data.token){
       var sender = MEMBER[socket.id];
+      io.to(sender.room).emit("s2c_dist", { id: sender.count, dist: minDist });
       var msg = sender.name + ": " + data.msg;
       Object.keys(MEMBER).forEach(function(key) {
         var member = MEMBER[key];
         var dist = calcDist(member.x, member.y, sender.x, sender.y);
-        console.log(dist);
-        if(dist<MIN_DIST)io.to(key).emit("s2c_msg", { msg: msg });
+        if(dist<minDist)io.to(key).emit("s2c_msg", { msg: msg });
       }, MEMBER);
     }
   });

@@ -1,30 +1,27 @@
 html, body { height: 100%; }
 
 body{
-	background-image: url(4012693_l.jpg);
-	color: white;
-	width: 100%;
+    background-image: url(4012693_l.jpg);
+    color: white;
+    width: 100vw;
 }
 
 .main-visual{
-	height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    height: 100vh;
 }
 
 .main-visual h1{
-	margin-bottom: 30px;
+    margin-bottom: 30px;
 }
 
 .form-control{
-	width: 300px;
-	margin: 0 auto;
-	margin-bottom: 20px;
+    width: 300px;
+    margin: 0 auto;
+    margin-bottom: 20px;
 }
 
 .g-recaptcha{
-	margin-right:auto;
+    margin-right:auto;
     margin-left:auto;
     text-align: center;
     width:300px;
@@ -32,25 +29,45 @@ body{
 }
 
 .btn-margin{
-	margin-top: 20px;
+    margin-top: 20px;
 }
 
 #chatLogs{
-	margin-top: 70px;
+    word-break: break-all;
+    overflow: scroll;
+    margin-top: 70px;
 }
 
-#conteiner-form{
-    height:100vh;
+#conteiner-util{
+    height: 100vh;
+    width: 30vh;
+    margin-right: 2vw;
 }
 
 #field{
-    border: 3px solid;
-    width: 100vw;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 70vw;
     height: 100vh;
+    overflow: hidden;
 }
 
 .avatar{
+    position: absolute;
+    left: 0px;
+    top: 0px;
     width: 5vw;
     height: 5vw;
-    border: 3px solid;
+    border-radius: 2.5vw;
+    color: navy;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    word-break: break-all;
+}
+
+.avatar-effect{
+    position: absolute;
 }
