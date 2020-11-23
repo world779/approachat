@@ -4,7 +4,6 @@ const http = require("http").Server(app);
 const io = require("socket.io")(http);
 const crypto = require("crypto");
 const DOCUMENT_ROOT = __dirname + "/public";
-const MIN_DIST = 1000;
 //デプロイ時は変更の上環境変数にして削除
 const SECRET_TOKEN = "abcdefghijklmn12345";
 
@@ -33,6 +32,7 @@ io.on("connection", function (socket) {
 
     // 本人にトークンを送付
     io.to(socket.id).emit("token", { token: token, id:MEMBER[socket.id].count });
+    console.log(socket.id);
   })();
 
   // ルームに入室されたらsocketをroomにjoinさせてメンバーリストにもそれを反映
@@ -44,7 +44,6 @@ io.on("connection", function (socket) {
       MEMBER[socket.id].room = data.room;
       socket.join(data.room);
       var msg = MEMBER[socket.id].name + "さんが入室しました。";
-      console.log(MEMBER);
       io.to(MEMBER[socket.id].room).emit("s2c_join", { id: MEMBER[socket.id].count, name: MEMBER[socket.id].name, msg: msg });
     }
   });
@@ -81,6 +80,9 @@ io.on("connection", function (socket) {
       io.to(MEMBER[socket.id].room).emit("s2c_leave", { id:MEMBER[socket.id].count, msg: msg });
     }
     delete MEMBER[socket.id];
+  });
+  socket.on("user-reconnected", function (data) {
+    console.log(data+"recconected");
   });
 });
 

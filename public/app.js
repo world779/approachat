@@ -18,6 +18,10 @@ socket.on("s2c_leave", function(data) {
   $(`#${data.id}`).remove();
 });
 
+socket.on("connect",function(data){
+    console.log(data);
+});
+
 socket.on("token", function(data){
   IAM.token = data.token;
   IAM.id = data.id;
@@ -25,7 +29,7 @@ socket.on("token", function(data){
 
 socket.on("initial_data", function(data) {
   Object.keys(data.data).forEach(function(key) {
-    member = this[key];
+    var member = this[key];
     console.log(member.count);
     if(member.room == IAM.room){
       appendAvatar(member.count, member.name);
@@ -45,6 +49,11 @@ socket.on("s2c_move", function(data){
 
 socket.on("s2c_dist",function(data){
   drawMsgRange(data.id, data.dist);
+});
+
+socket.on("reconnect", function () {
+  console.log("you have been reconnected");
+  socket.emit("c2s_recconect", {});
 });
 
 function appendAvatar(id, name) {
@@ -73,8 +82,10 @@ $("form").submit(function (e) {
 });
 
 $("#field").click(function(e){
-  console.log(e);
-  socket.emit("c2s_move", { token:IAM.token, x:e.offsetX , y:e.offsetY });
+  var offset = $(this).offset();
+  var x = e.pageX - offset.left;
+  var y = e.pageY - offset.top;
+  socket.emit("c2s_move", { token:IAM.token, x:x , y:y });
 });
 
 
