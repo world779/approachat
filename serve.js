@@ -4,8 +4,10 @@ const http = require("http").Server(app);
 const io = require("socket.io")(http);
 const crypto = require("crypto");
 const DOCUMENT_ROOT = __dirname + "/public";
-//デプロイ時は変更の上環境変数にして削除
-const SECRET_TOKEN = "abcdefghijklmn12345";
+
+require('dotenv').config();
+
+const SECRET_TOKEN = process.env.SECRET_TOKEN;
 
 const MEMBER = {};
 const TOKENS = {};
@@ -24,18 +26,13 @@ io.on("connection", function (socket) {
     (()=>{
     // トークンを作成
         const data=socket.handshake.query;
-        console.log(data);
         if(data.reconnect=="true"){
             if(TOKENS[data.socketId] == data.token){
-                console.log(MEMBER);
-                console.log(MEMBER[socket.id]);
-                console.log(MEMBER[data.socketId]);
                 MEMBER[socket.id] = MEMBER[data.socketId];
                 TOKENS[socket.id] = data.token;
                 socket.join(MEMBER[socket.id].room);
                 delete MEMBER[data.socketId];
                 delete TOKENS[data.socketId];
-                console.log("-------");
             }
         }else{
             const token = crypto.createHash("sha1").update(SECRET_TOKEN + socket.id).digest('hex');
@@ -81,7 +78,6 @@ io.on("connection", function (socket) {
   });
 
   socket.on("c2s_dist",function(data){
-  console.log("dist changed");
     MEMBER[socket.id].dist = data.dist;
     io.to(MEMBER[socket.id].room).emit("s2c_dist", { id: MEMBER[socket.id].count, dist: data.dist });
   });
@@ -91,7 +87,6 @@ io.on("connection", function (socket) {
           MEMBER[socket.id].x = data.x;
           MEMBER[socket.id].y = data.y;
           io.to(MEMBER[socket.id].room).emit("s2c_move", { id: MEMBER[socket.id].count, x:MEMBER[socket.id].x, y:MEMBER[socket.id].y });
-          console.log(MEMBER);
       }
   });
 

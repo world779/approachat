@@ -30,14 +30,12 @@ socket.on("s2c_leave", function(data) {
 socket.on("connect",function(data){
   IAM.socketId = socket.id;
   console.log("connected");
-  console.log(socket);
 });
 
 socket.on("token", function(data){
   if(!IAM.isConnected){
     IAM.token = data.token;
     IAM.id = data.id;
-    console.log(IAM);
     IAM.isConnected = true;
   }
 });
@@ -45,7 +43,6 @@ socket.on("token", function(data){
 socket.on("initial_data", function(data) {
   Object.keys(data.data).forEach(function(key) {
     var member = this[key];
-    console.log(member.count);
     if(member.room == IAM.room){
       appendAvatar(member.count, member.color);
       $(`#${member.count}`).css("transform",`translateX(${member.x}px) translateY(${member.y}px)`);
@@ -62,7 +59,6 @@ socket.on("s2c_join", function(data){
 });
 
 socket.on("s2c_move", function(data){
-  console.log(data);
   moveAvatar(data.id, data.x, data.y);
 });
 
@@ -83,13 +79,11 @@ socket.on('disconnect', function () {
 })
 
 socket.on("reconnect",function(){
-  console.log("reconnected");
 });
 
 function appendAvatar(id, color) {
   $("#field").append(`<div id=${id} class="avatar">${id}<div id=${id}-effect class="avatar-effect"></div></div>`);
   $(`#${id}`).css("background-color", color);
-  console.log($("#id"));
 }
 
 function appendMsg(text, color) {
@@ -120,7 +114,6 @@ $("#field").click(function(e){
   var x = e.pageX - offset.left;
   var y = e.pageY - offset.top;
   socket.emit("c2s_move", { token:IAM.token, x:x , y:y });
-  console.log("move");
 });
 
 window.onresize = function(e){
@@ -147,7 +140,6 @@ function changeLabel() {
   $("#container-util").append('<div class="text-right"><button type="button" class="btn btn-danger btn-sm" id="disconnect">退出する</button></div>');
   $("#dist").change(onDistChange);
   $("#disconnect").click(function(e){
-  console.log("切った");
   socket.emit("c2s_leave");
   socket.disconnect();
 });
@@ -177,7 +169,6 @@ function fetchField(width, height){
   var fieldSize = $("#field").css(["min-width", "min-height"]);
   var fieldWidth = parseInt(fieldSize["min-width"], 10);
   var fieldHeight = parseInt(fieldSize["min-height"], 10);
-  console.log(Math.max(fieldWidth, width));
   $("#field").css({"min-width": Math.max(fieldWidth, width), "min-height": Math.max(fieldHeight, height)});
 
 }
@@ -185,7 +176,6 @@ function fetchField(width, height){
 function genRandColor(){
   var hue = Math.floor(Math.random()*10)*36;
   var sat = Math.floor(Math.random()*40)+25;
-  console.log(sat);
   var color = `hsl(${hue}, 50%, ${sat}%)`;
 
   return color;
@@ -194,7 +184,6 @@ function genRandColor(){
 function drawMsgRange(id, dist){
   const effect = document.getElementById(`${id}-effect`);
   const color = $(`#${id}`).css("background-color");
-  console.log(color);
   var tl = anime.timeline({
     duration: 500
   });
