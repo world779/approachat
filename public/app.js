@@ -48,7 +48,7 @@ socket.on("initial_data", function(data) {
     console.log(member.count);
     if(member.room == IAM.room){
       appendAvatar(member.count, member.color);
-      moveAvatar(member.count, member.x, member.y);
+      $(`#${member.count}`).css("transform",`translateX(${member.x}px) translateY(${member.y}px)`);
       drawCurrentDist(member.count, member.dist);
     }
   }, data.data);
@@ -58,6 +58,7 @@ socket.on("s2c_join", function(data){
   appendMsg(data.msg, data.color);
   appendAvatar(data.id, data.color);
   drawCurrentDist(data.id, data.dist);
+  $(`#${data.id}`).css("transform",`translateX(${data.x}px) translateY(${data.y}px)`);
 });
 
 socket.on("s2c_move", function(data){
@@ -79,29 +80,11 @@ socket.on('disconnect', function () {
     socketId: IAM.socketId,
     token: IAM.token
   }
-  $(".alert").alert();
 })
-
-$(".alert").on("closed.bs.alert", function(){
-});
 
 socket.on("reconnect",function(){
   console.log("reconnected");
 });
-
-function manualRecconect(){
-  console.log("reconnecting");
-  socket = io.connect({ 
-    reconnection : false,
-    query : {
-      reconnect: (IAM.isConnected?"true":"false"),
-      socketId: IAM.socketId,
-      token: IAM.token
-      }
-  });
-  console.log(socket.query);
-}
-
 
 function appendAvatar(id, color) {
   $("#field").append(`<div id=${id} class="avatar">${id}<div id=${id}-effect class="avatar-effect"></div></div>`);
@@ -111,6 +94,8 @@ function appendAvatar(id, color) {
 
 function appendMsg(text, color) {
   $("#chatLogs").append(`<div style="color: ${color};">${text}</div>`);
+  var log = document.getElementById("chatLogs");
+  log.scrollTop = log.scrollHeight;
 }
 
 $("form").submit(function (e) {
@@ -138,6 +123,10 @@ $("#field").click(function(e){
   console.log("move");
 });
 
+window.onresize = function(e){
+  fetchField(window.innerWidth, window.innerHeight);
+};
+
 function toggleUtil(){
   const util = document.getElementById("container-util");
   anime({
@@ -155,7 +144,13 @@ function changeLabel() {
   $("#sendButton").text("送信");
   $(".form-row").append('<input type="text" id="msgForm" class="form-control" autocomplete="off">');
   $(".form-row").append('<label class="nameLabel" for="dist">伝わる距離</label>\n<input type="range" id="dist" class="form-control" min="1" max="1000" value="80" step="5">');
+  $("#container-util").append('<div class="text-right"><button type="button" class="btn btn-danger btn-sm" id="disconnect">退出する</button></div>');
   $("#dist").change(onDistChange);
+  $("#disconnect").click(function(e){
+  console.log("切った");
+  socket.emit("c2s_leave");
+  socket.disconnect();
+});
 }
 
 function onDistChange(){
@@ -165,11 +160,7 @@ function onDistChange(){
 
 function moveAvatar(id, x, y){
   const avatar = document.getElementById(id);
-  var fieldSize = $("#field").css(["min-width", "min-height"]);
-  var fieldWidth = parseInt(fieldSize["min-width"], 10);
-  var fieldHeight = parseInt(fieldSize["min-height"], 10);
-  console.log(Math.max(fieldWidth, x));
-  $("#field").css({"min-width": Math.max(fieldWidth, x), "min-height": Math.max(fieldHeight, y)});
+  fetchField(x, y);
   if(id = IAM.id) IAM.isMoving = true;
   anime({
     targets: avatar,
@@ -182,9 +173,18 @@ function moveAvatar(id, x, y){
   });
 }
 
+function fetchField(width, height){
+  var fieldSize = $("#field").css(["min-width", "min-height"]);
+  var fieldWidth = parseInt(fieldSize["min-width"], 10);
+  var fieldHeight = parseInt(fieldSize["min-height"], 10);
+  console.log(Math.max(fieldWidth, width));
+  $("#field").css({"min-width": Math.max(fieldWidth, width), "min-height": Math.max(fieldHeight, height)});
+
+}
+
 function genRandColor(){
   var hue = Math.floor(Math.random()*10)*36;
-  var sat = Math.floor(Math.random()*35)+20;
+  var sat = Math.floor(Math.random()*40)+25;
   console.log(sat);
   var color = `hsl(${hue}, 50%, ${sat}%)`;
 

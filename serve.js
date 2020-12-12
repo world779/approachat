@@ -58,7 +58,11 @@ io.on("connection", function (socket) {
       MEMBER[socket.id].color = data.color;
       socket.join(data.room);
       var msg = "入室がありました";
-      io.to(MEMBER[socket.id].room).emit("s2c_join", { id: MEMBER[socket.id].count, color: data.color, dist: 80, msg: msg });
+      var x = Math.floor(Math.random() * 50) * 10 + 250;
+      var y = Math.floor(Math.random() * 50) * 10 + 50;
+      MEMBER[socket.id].x = x;
+      MEMBER[socket.id].y = y;
+      io.to(MEMBER[socket.id].room).emit("s2c_join", { id: MEMBER[socket.id].count, color: data.color, x:x, y:y, dist: 80, msg: msg });
     }
   });
   // メッセージがきたら名前とメッセージをくっつけて送り返す
@@ -91,15 +95,13 @@ io.on("connection", function (socket) {
       }
   });
 
-  // S09. dicconnectイベントを受信し、退出メッセージを送信する
+  socket.on("c2s_leave", function(data){
+    var msg = MEMBER[socket.id].name + "さんが退出しました。";
+    io.to(MEMBER[socket.id].room).emit("s2c_leave", { id:MEMBER[socket.id].count, msg: msg, color: MEMBER[socket.id].color });
+    delete MEMBER[socket.id];
+  });
+
   socket.on("disconnect", function () {
-    // if (MEMBER[socket.id].name == null) {
-    //   console.log("未入室のまま、どこかへ去っていきました。");
-    // } else {
-      // var msg = MEMBER[socket.id].name + "さんが退出しました。";
-      // io.to(MEMBER[socket.id].room).emit("s2c_leave", { id:MEMBER[socket.id].count, msg: msg, color: MEMBER[socket.id].color });
-    // }
-    // delete MEMBER[socket.id];
   });
 });
 
