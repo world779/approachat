@@ -23,23 +23,36 @@ io.on("connection", function (socket) {
 
     (()=>{
     // トークンを作成
-    const token = crypto.createHash("sha1").update(SECRET_TOKEN + socket.id).digest('hex');
+        const data=socket.handshake.query;
+        console.log(data);
+        if(data.reconnect=="true"){
+            if(TOKENS[data.socketId] == data.token){
+                console.log(MEMBER);
+                console.log(MEMBER[socket.id]);
+                console.log(MEMBER[data.socketId]);
+                MEMBER[socket.id] = MEMBER[data.socketId];
+                TOKENS[socket.id] = data.token;
+                delete MEMBER[data.socketId];
+                delete TOKENS[data.socketId];
+                console.log("-------");
+            }
+        }else{
+            const token = crypto.createHash("sha1").update(SECRET_TOKEN + socket.id).digest('hex');
+            // ユーザーリストに追加
+            MEMBER[socket.id] = {name:null, room:null, count:MEMBER_COUNT, x: 0, y: 0};
+            TOKENS[socket.id] = token;
+            MEMBER_COUNT++;
 
-    // ユーザーリストに追加
-    MEMBER[socket.id] = {name:null, room:null, count:MEMBER_COUNT, x: 0, y: 0};
-    TOKENS[socket.id] = token;
-    MEMBER_COUNT++;
+            // 本人にトークンを送付
+            io.to(socket.id).emit("token", { token: token, id:MEMBER[socket.id].count });
+        }
+    })();
 
-    // 本人にトークンを送付
-    io.to(socket.id).emit("token", { token: token, id:MEMBER[socket.id].count });
-    console.log(socket.id);
-  })();
 
   // ルームに入室されたらsocketをroomにjoinさせてメンバーリストにもそれを反映
   socket.on("c2s_join", function (data) {
     if(data.token == TOKENS[socket.id]){
       io.to(socket.id).emit("initial_data", { data: MEMBER });
-      console.log(MEMBER);
       MEMBER[socket.id].name = data.name;
       MEMBER[socket.id].room = data.room;
       socket.join(data.room);
@@ -58,31 +71,29 @@ io.on("connection", function (socket) {
       Object.keys(MEMBER).forEach(function(key) {
         var member = MEMBER[key];
         var dist = calcDist(member.x, member.y, sender.x, sender.y);
-        if(dist<minDist)io.to(key).emit("s2c_msg", { msg: msg });
+        if(dist<minDist && member.room==sender.room)io.to(key).emit("s2c_msg", { msg: msg });
       }, MEMBER);
     }
   });
 
   socket.on("c2s_move", function(data){
-    if(TOKENS[socket.id] == data.token){
-      MEMBER[socket.id].x = data.x;
-      MEMBER[socket.id].y = data.y;
-      io.to(MEMBER[socket.id].room).emit("s2c_move", { id: MEMBER[socket.id].count, x:MEMBER[socket.id].x, y:MEMBER[socket.id].y });
-    }
+      if(TOKENS[socket.id] == data.token){
+          MEMBER[socket.id].x = data.x;
+          MEMBER[socket.id].y = data.y;
+          io.to(MEMBER[socket.id].room).emit("s2c_move", { id: MEMBER[socket.id].count, x:MEMBER[socket.id].x, y:MEMBER[socket.id].y });
+          console.log(data);
+      }
   });
 
   // S09. dicconnectイベントを受信し、退出メッセージを送信する
   socket.on("disconnect", function () {
-    if (MEMBER[socket.id].name == null) {
-      console.log("未入室のまま、どこかへ去っていきました。");
-    } else {
-      var msg = MEMBER[socket.id].name + "さんが退出しました。";
-      io.to(MEMBER[socket.id].room).emit("s2c_leave", { id:MEMBER[socket.id].count, msg: msg });
-    }
-    delete MEMBER[socket.id];
-  });
-  socket.on("user-reconnected", function (data) {
-    console.log(data+"recconected");
+    // if (MEMBER[socket.id].name == null) {
+    //   console.log("未入室のまま、どこかへ去っていきました。");
+    // } else {
+      // var msg = MEMBER[socket.id].name + "さんが退出しました。";
+      // io.to(MEMBER[socket.id].room).emit("s2c_leave", { id:MEMBER[socket.id].count, msg: msg });
+    // }
+    // delete MEMBER[socket.id];
   });
 });
 
@@ -92,4 +103,4 @@ function calcDist(x1, y1, x2, y2){
 
 http.listen(3000, function(){
     console.log("listening on *:3000");
-})
+});
