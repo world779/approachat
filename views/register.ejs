@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>登録画面</title>
+  </head>
+  <body>
+    <h1>登録画面</h1>
+
+    <ul>
+      <% if(typeof errors != 'undefined') { %> <% errors.forEach(error=>{ %>
+      <li><%= error.message %></li>
+      <% }) %> <% } %>
+    </ul>
+
+    <form action="/users/register" method="POST">
+      <div>
+        <label for="name1">名前：</label>
+        <input type="text" name="name" placeholder="名前" required />
+      </div>
+      <div>
+        <label for="name1">メールアドレス：</label>
+        <input
+          type="email"
+          name="email"
+          placeholder="メールアドレス"
+          required
+        />
+      </div>
+      <div>
+        <label>パスワード：</label>
+        <input
+          type="password"
+          name="password"
+          placeholder="パスワード"
+          required
+        />
+      </div>
+      <div>
+        <label>パスワード確認：</label>
+        <input
+          type="password2"
+          name="password2"
+          placeholder="パスワード確認"
+          required
+        />
+      </div>
+      <div>
+        <input type="submit" value="Register" />
+      </div>
+      <a href="/users/login">ログイン画面はこちらから</a>
+    </form>
+  </body>
+</html>
