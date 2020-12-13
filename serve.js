@@ -15,8 +15,10 @@ const io = require("socket.io")(http);
 const crypto = require("crypto");
 const { report } = require("process");
 const DOCUMENT_ROOT = __dirname + "/public";
-//デプロイ時は変更の上環境変数にして削除
-const SECRET_TOKEN = "abcdefghijklmn12345";
+
+require('dotenv').config();
+
+const SECRET_TOKEN = process.env.SECRET_TOKEN;
 
 const MEMBER = {};
 const TOKENS = {};
@@ -159,6 +161,7 @@ app.use("/animejs", express.static(__dirname + "/node_modules/animejs/lib/"));
 io.on("connection", function (socket) {
   (() => {
     // トークンを作成
+<<<<<<< HEAD
     const token = crypto
       .createHash("sha1")
       .update(SECRET_TOKEN + socket.id)
@@ -182,21 +185,52 @@ io.on("connection", function (socket) {
     });
     console.log(socket.id);
   })();
+=======
+        const data=socket.handshake.query;
+        if(data.reconnect=="true"){
+            if(TOKENS[data.socketId] == data.token){
+                MEMBER[socket.id] = MEMBER[data.socketId];
+                TOKENS[socket.id] = data.token;
+                socket.join(MEMBER[socket.id].room);
+                delete MEMBER[data.socketId];
+                delete TOKENS[data.socketId];
+            }
+        }else{
+            const token = crypto.createHash("sha1").update(SECRET_TOKEN + socket.id).digest('hex');
+            // ユーザーリストに追加
+            MEMBER[socket.id] = { room:null, count:MEMBER_COUNT, x: 0, y: 0, color:null, dist: 0};
+            TOKENS[socket.id] = token;
+            MEMBER_COUNT++;
+
+            // 本人にトークンを送付
+            io.to(socket.id).emit("token", { token: token, id:MEMBER[socket.id].count });
+        }
+    })();
+
+>>>>>>> dfbda2212aeca07f7a301375fa716213e8328664
 
   // ルームに入室されたらsocketをroomにjoinさせてメンバーリストにもそれを反映
   socket.on("c2s_join", function (data) {
     if (data.token == TOKENS[socket.id]) {
       io.to(socket.id).emit("initial_data", { data: MEMBER });
-      console.log(MEMBER);
-      MEMBER[socket.id].name = data.name;
       MEMBER[socket.id].room = data.room;
+      MEMBER[socket.id].color = data.color;
       socket.join(data.room);
+<<<<<<< HEAD
       var msg = MEMBER[socket.id].name + "さんが入室しました。";
       io.to(MEMBER[socket.id].room).emit("s2c_join", {
         id: MEMBER[socket.id].count,
         name: MEMBER[socket.id].name,
         msg: msg,
       });
+=======
+      var msg = "入室がありました";
+      var x = Math.floor(Math.random() * 50) * 10 + 250;
+      var y = Math.floor(Math.random() * 50) * 10 + 50;
+      MEMBER[socket.id].x = x;
+      MEMBER[socket.id].y = y;
+      io.to(MEMBER[socket.id].room).emit("s2c_join", { id: MEMBER[socket.id].count, color: data.color, x:x, y:y, dist: 80, msg: msg });
+>>>>>>> dfbda2212aeca07f7a301375fa716213e8328664
     }
   });
   // メッセージがきたら名前とメッセージをくっつけて送り返す
@@ -205,16 +239,25 @@ io.on("connection", function (socket) {
     var minDist = data.dist;
     if (TOKENS[socket.id] == data.token) {
       var sender = MEMBER[socket.id];
+<<<<<<< HEAD
       io.to(sender.room).emit("s2c_dist", { id: sender.count, dist: minDist });
       var msg = sender.name + ": " + data.msg;
       Object.keys(MEMBER).forEach(function (key) {
         var member = MEMBER[key];
         var dist = calcDist(member.x, member.y, sender.x, sender.y);
         if (dist < minDist) io.to(key).emit("s2c_msg", { msg: msg });
+=======
+      io.to(sender.room).emit("s2c_talking", { id: sender.count, dist: minDist });
+      Object.keys(MEMBER).forEach(function(key) {
+        var member = MEMBER[key];
+        var dist = calcDist(member.x, member.y, sender.x, sender.y);
+        if(dist<minDist && member.room==sender.room)io.to(key).emit("s2c_msg", { msg: data.msg, color: sender.color });
+>>>>>>> dfbda2212aeca07f7a301375fa716213e8328664
       }, MEMBER);
     }
   });
 
+<<<<<<< HEAD
   socket.on("c2s_move", function (data) {
     if (TOKENS[socket.id] == data.token) {
       MEMBER[socket.id].x = data.x;
@@ -242,6 +285,28 @@ io.on("connection", function (socket) {
   });
   socket.on("user-reconnected", function (data) {
     console.log(data + "recconected");
+=======
+  socket.on("c2s_dist",function(data){
+    MEMBER[socket.id].dist = data.dist;
+    io.to(MEMBER[socket.id].room).emit("s2c_dist", { id: MEMBER[socket.id].count, dist: data.dist });
+  });
+
+  socket.on("c2s_move", function(data){
+      if(TOKENS[socket.id] == data.token){
+          MEMBER[socket.id].x = data.x;
+          MEMBER[socket.id].y = data.y;
+          io.to(MEMBER[socket.id].room).emit("s2c_move", { id: MEMBER[socket.id].count, x:MEMBER[socket.id].x, y:MEMBER[socket.id].y });
+      }
+  });
+
+  socket.on("c2s_leave", function(data){
+    var msg = MEMBER[socket.id].name + "さんが退出しました。";
+    io.to(MEMBER[socket.id].room).emit("s2c_leave", { id:MEMBER[socket.id].count, msg: msg, color: MEMBER[socket.id].color });
+    delete MEMBER[socket.id];
+  });
+
+  socket.on("disconnect", function () {
+>>>>>>> dfbda2212aeca07f7a301375fa716213e8328664
   });
 });
 
@@ -249,6 +314,11 @@ function calcDist(x1, y1, x2, y2) {
   return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 }
 
+<<<<<<< HEAD
 http.listen(3000, function () {
   console.log("listening on *:3000");
+=======
+http.listen(3000, function(){
+    console.log("listening on *:3000");
+>>>>>>> dfbda2212aeca07f7a301375fa716213e8328664
 });

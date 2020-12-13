@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>websocket-chat</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"
+      />
+    <link
+      rel="stylesheet"
+      href="index.css"
+      />
+    <script src="https://www.google.com/recaptcha/api.js"></script>
+    <script>
+      function validateRecaptcha ( code ) {
+        if ( !!code ) {
+          var form = document.querySelector(".recaptcha");
+          form.removeAttribute('disabled');
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="field">
+      <div class="main-visual text-center">
+        <div id="conteiner-util">
+          <h1>Chat</h1>
+          <form>
+            <div class="form-group">
+              <label class="roomLabel" for="rooms">部屋</label>
+              <select id="rooms">
+                <option value="room01">部屋01</option>
+                <option value="room02">部屋02</option>
+              </select>
+              <label class="nameLabel" for="msgForm">名前</label>
+              <input type="text" id="msgForm" />
+              <label class="passLabel" for="msgForm">パスワード</label>
+              <input type="password" id="msgForm" size="30" maxlength="30">
+              <div class="g-recaptcha recaptcha" data-callback="validateRecaptcha" data-sitekey=""></div>
+            </div>
+            <button type="submit" class="btn btn-success btn-lg btn-margin" id="sendButton">
+              入室
+            </button>
+          </form>
+          <div id="chatLogs"></div>
+        </div>
+      </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script src="animejs/anime.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
