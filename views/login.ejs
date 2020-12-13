@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ログイン画面</title>
+  </head>
+  <body>
+    <h1>ログイン画面</h1>
+
+    <ul>
+      <% if(messages.success_msg) { %>
+      <li><%= messages.success_msg %></li>
+      <% } %>
+    </ul>
+
+    <ul>
+      <% if (messages.error) { %>
+      <li><%= messages.error %></li>
+      <% } %>
+    </ul>
+
+    <form action="/users/login" method="POST">
+      <div>
+        <label for="name1">メールアドレス：</label>
+        <input
+          type="email"
+          name="email"
+          placeholder="メールアドレス"
+          required
+        />
+      </div>
+      <div>
+        <label>パスワード：</label>
+        <input
+          type="password"
+          name="password"
+          placeholder="パスワード"
+          required
+        />
+      </div>
+      <div>
+        <input type="submit" value="Login" />
+      </div>
+      <a href="/users/register">登録画面はこちらから</a>
+    </form>
+  </body>
+</html>
