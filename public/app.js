@@ -9,14 +9,7 @@ const IAM = {
   isMoving : false
 }
 
-var detach_room_Label;
-
 var utilIsOpen = true;
-
-var print = function(msg) {
-  return $('#log').prepend($('<p>').text(msg));
-};
-
 
 var socket = io.connect({ 
   query : {
@@ -144,7 +137,7 @@ function toggleUtil(){
 }
 
 function changeLabel() {
-  detach_room_Label = $(".roomLabel").remove();
+  $(".roomLabel").remove();
   $(".passLabel").remove();
   $("#rooms").remove();
   $("#pass").remove();
