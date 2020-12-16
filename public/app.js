@@ -9,13 +9,21 @@ const IAM = {
   isMoving : false
 }
 
+var detach_room_Label;
+
 var utilIsOpen = true;
+
+var print = function(msg) {
+  return $('#log').prepend($('<p>').text(msg));
+};
+
 
 var socket = io.connect({ 
   query : {
     reconnect: false
   }
 }); // C02. ソケットへの接続
+
 
 // C04. server_to_clientイベント・データを受信する
 socket.on("s2c_msg", function (data) {
@@ -76,6 +84,8 @@ socket.on('disconnect', function () {
     socketId: IAM.socketId,
     token: IAM.token
   }
+  changeLabel_out();
+  removeAvatar();
 })
 
 socket.on("reconnect",function(){
@@ -84,6 +94,10 @@ socket.on("reconnect",function(){
 function appendAvatar(id, color) {
   $("#field").append(`<div id=${id} class="avatar">${id}<div id=${id}-effect class="avatar-effect"></div></div>`);
   $(`#${id}`).css("background-color", color);
+}
+
+function removeAvatar() {
+  $(".avatar").remove();
 }
 
 function appendMsg(text, color) {
@@ -130,11 +144,12 @@ function toggleUtil(){
 }
 
 function changeLabel() {
-  $(".roomLabel").remove();
+  detach_room_Label = $(".roomLabel").remove();
   $(".passLabel").remove();
   $("#rooms").remove();
   $("#pass").remove();
   $("#sendButton").text("送信");
+  $(".form-row").append('<label class="nameLabel">コメント</label>');
   $(".form-row").append('<input type="text" id="msgForm" class="form-control" autocomplete="off">');
   $(".form-row").append('<label class="nameLabel" for="dist">伝わる距離</label>\n<input type="range" id="dist" class="form-control" min="1" max="1000" value="80" step="5">');
   $("#container-util").append('<div class="text-right"><button type="button" class="btn btn-danger btn-sm" id="disconnect">退出する</button></div>');
@@ -144,6 +159,20 @@ function changeLabel() {
   socket.disconnect();
 });
 }
+
+function changeLabel_out() {
+  $(".nameLabel").remove();
+  $(".form-control").remove();
+  $(".dist").remove();
+  $(".form-control").remove();
+  $(".text-right").remove();
+  $("#sendButton").text("入室");
+  $(".form-row").append('<label class="roomLabel" for="rooms">部屋</label>');
+  $(".form-row").append('<input type="text" id="rooms" class="form-control" >');
+  $(".form-row").append('<label class="nameLabel">パスワード</label>');
+  $(".form-row").append('<input type="password" class="form-control form-pass" id="pass" maxlength="30">');
+}
+
 
 function onDistChange(){
   var dist = $("#dist").val();
