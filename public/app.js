@@ -77,9 +77,7 @@ socket.on('disconnect', function () {
     socketId: IAM.socketId,
     token: IAM.token
   }
-  toggleForm();
-  removeAvatar();
-})
+});
 
 socket.on("reconnect",function(){
 });
@@ -107,6 +105,7 @@ $("form").submit(function (e) {
     var message = $("#msgForm").val();
     var dist = $("#dist").val();
     socket.emit("c2s_msg", { token: IAM.token, dist: dist, msg: message });
+    $("#msgForm").val("");
   } else {
     var room = $("#roomForm").val();
     IAM.room = room;
@@ -127,13 +126,19 @@ $("#field").click(function(e){
 
 $("#dist").change(onDistChange);
 $("#disconnect").click(function(){
-    socket.emit("c2s_leave");
-    socket.disconnect();
+  socket.emit("c2s_leave");
+  socket.disconnect();
+  toggleForm();
+  removeAvatar();
 });
 
 
 window.onresize = function(e){
   fetchField(window.innerWidth, window.innerHeight);
+};
+
+window.onbeforeunload = function(){
+  socket.emit("c2s_leave");
 };
 
 function toggleUtil(){
@@ -155,7 +160,6 @@ function toggleForm(){
         $("#enterForm").css("display", "none");
     }
 }
-
 
 function onDistChange(){
   var dist = $("#dist").val();
@@ -199,17 +203,6 @@ function drawMsgRange(id, dist){
   const color = $(`#${id}`).css("background-color");
   var tl = anime.timeline({
     duration: 500,
-  });
-  tl.add({
-    targets: avatar,
-    scale: scale,
-    opacity: 0.3,
-    easing: "linear",
-  }).add({
-    targets: avatar,
-    scale: 1,
-    opacity: 1,
-    easing: "easeInElastic(1, .6)",
   });
   tl
     .add({
