@@ -5,16 +5,6 @@ body{
     background-color: #fafaf9;
 }
 
-.form-control{
-    width: 300px;
-    margin: 0 auto;
-    margin-bottom: 20px;
-}
-
-.dist{
-    background-color: orange;
-}
-
 .g-recaptcha{
     margin-right:auto;
     margin-left:auto;
@@ -23,13 +13,7 @@ body{
     margin-top:40px;
 }
 
-.btn-margin{
-    margin-top: 20px;
-}
-
 #chatLogs{
-    margin-top: 20px;
-    margin-bottom: 20px;
     height:300px;
     word-break: break-all;
     overflow: scroll;

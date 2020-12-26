@@ -15,7 +15,7 @@ var socket = io.connect({
   query : {
     reconnect: false
   }
-}); // C02. ソケットへの接続
+});
 
 
 // C04. server_to_clientイベント・データを受信する
