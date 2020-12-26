@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const session = require("express-session");
 const flash = require("express-flash");
 const passport = require("passport");
+const xss = require("xss");
 
 const initializePassport = require("./passportConfig");
 
@@ -21,7 +22,8 @@ require('dotenv').config();
 const SECRET_TOKEN = process.env.SECRET_TOKEN;
 
 const MIN_DIST = 50;
-const MAX_DIST = 1000;
+const MAX_DIST = 500;
+const MAX_MSG_LENGTH = 2000;
 
 const MEMBER = {};
 const TOKENS = {};
@@ -164,26 +166,26 @@ app.use("/animejs", express.static(__dirname + "/node_modules/animejs/lib/"));
 io.on("connection", function (socket) {
   (() => {
     // トークンを作成
-        const data=socket.handshake.query;
-        if(data.reconnect=="true"){
-            if(TOKENS[data.socketId] == data.token){
-                MEMBER[socket.id] = MEMBER[data.socketId];
-                TOKENS[socket.id] = data.token;
-                socket.join(MEMBER[socket.id].room);
-                delete MEMBER[data.socketId];
-                delete TOKENS[data.socketId];
-            }
-        }else{
-            const token = crypto.createHash("sha1").update(SECRET_TOKEN + socket.id).digest('hex');
-            // ユーザーリストに追加
-            MEMBER[socket.id] = { room:null, count:MEMBER_COUNT, x: 0, y: 0, color:null, dist: 0};
-            TOKENS[socket.id] = token;
-            MEMBER_COUNT++;
+    const data=socket.handshake.query;
+    if(data.reconnect=="true"){
+      if(TOKENS[data.socketId] == data.token){
+        MEMBER[socket.id] = MEMBER[data.socketId];
+        TOKENS[socket.id] = data.token;
+        socket.join(MEMBER[socket.id].room);
+        delete MEMBER[data.socketId];
+        delete TOKENS[data.socketId];
+      }
+    }else{
+      const token = crypto.createHash("sha1").update(SECRET_TOKEN + socket.id).digest('hex');
+      // ユーザーリストに追加
+      MEMBER[socket.id] = { room:null, count:MEMBER_COUNT, x: 0, y: 0, color:null, dist: 0};
+      TOKENS[socket.id] = token;
+      MEMBER_COUNT++;
 
-            // 本人にトークンを送付
-            io.to(socket.id).emit("token", { token: token, id:MEMBER[socket.id].count });
-        }
-    })();
+      // 本人にトークンを送付
+      io.to(socket.id).emit("token", { token: token, id:MEMBER[socket.id].count });
+    }
+  })();
 
 
   // ルームに入室されたらsocketをroomにjoinさせてメンバーリストにもそれを反映
@@ -201,40 +203,47 @@ io.on("connection", function (socket) {
       io.to(MEMBER[socket.id].room).emit("s2c_join", { id: MEMBER[socket.id].count, color: data.color, x:x, y:y, dist: 80, msg: msg });
     }
   });
-  // メッセージがきたら名前とメッセージをくっつけて送り返す
+
   socket.on("c2s_msg", function (data) {
-    // S06. server_to_clientイベント・データを送信する
-    var minDist = data.dist;
+    var msg = data.msg;
+    if(msg.length > MAX_MSG_LENGTH) return;
+    msg = xss(msg);
+    var minDist = MEMBER[socket.id].dist;
     if (TOKENS[socket.id] == data.token) {
       var sender = MEMBER[socket.id];
       io.to(sender.room).emit("s2c_talking", { id: sender.count, dist: minDist });
       Object.keys(MEMBER).forEach(function(key) {
         var member = MEMBER[key];
         var dist = calcDist(member.x, member.y, sender.x, sender.y);
-        if(dist<minDist && member.room==sender.room)io.to(key).emit("s2c_msg", { msg: data.msg, color: sender.color });
+        if(dist<minDist && member.room==sender.room)io.to(key).emit("s2c_msg", { msg: msg, color: sender.color });
       }, MEMBER);
     }
   });
 
   socket.on("c2s_dist",function(data){
-    if(data.dist < MIN_DIST) data.dist = MIN_DIST;
-    if(data.dist > MAX_DIST) data.dist = MAX_DIST;
-    MEMBER[socket.id].dist = data.dist;
-    io.to(MEMBER[socket.id].room).emit("s2c_dist", { id: MEMBER[socket.id].count, dist: data.dist });
+    var dist = data.dist;
+    if(dist > 100) dist = 100;
+    dist = dist * MAX_DIST / 100 + MIN_DIST
+    MEMBER[socket.id].dist = dist;
+    io.to(MEMBER[socket.id].room).emit("s2c_dist", { id: MEMBER[socket.id].count, dist: dist });
   });
 
   socket.on("c2s_move", function(data){
-      if(TOKENS[socket.id] == data.token){
-          MEMBER[socket.id].x = data.x;
-          MEMBER[socket.id].y = data.y;
-          io.to(MEMBER[socket.id].room).emit("s2c_move", { id: MEMBER[socket.id].count, x:MEMBER[socket.id].x, y:MEMBER[socket.id].y });
-      }
+    if(TOKENS[socket.id] == data.token){
+      MEMBER[socket.id].x = data.x;
+      MEMBER[socket.id].y = data.y;
+      io.to(MEMBER[socket.id].room).emit("s2c_move", { id: MEMBER[socket.id].count, x:MEMBER[socket.id].x, y:MEMBER[socket.id].y });
+    }
   });
 
   socket.on("c2s_leave", function(data){
-    var msg = "退出しました";
-    io.to(MEMBER[socket.id].room).emit("s2c_leave", { id:MEMBER[socket.id].count, msg: msg, color: MEMBER[socket.id].color });
-    delete MEMBER[socket.id];
+    try{
+      var msg = "退出しました";
+      io.to(MEMBER[socket.id].room).emit("s2c_leave", { id:MEMBER[socket.id].count, msg: msg, color: MEMBER[socket.id].color });
+      delete MEMBER[socket.id];
+    }catch{
+      console.log("未入室のユーザが退出しました")
+    }
   });
 
   socket.on("disconnect", function () {

@@ -9,6 +9,8 @@ const IAM = {
   isMoving : false
 }
 
+const MAX_MSG_LENGTH = 2000;
+
 var utilIsOpen = true;
 
 var socket = io.connect({ 
@@ -125,6 +127,8 @@ $("#field").click(function(e){
 });
 
 $("#dist").change(onDistChange);
+document.getElementById("msgForm").addEventListener("input", validateMsgLength);
+
 $("#disconnect").click(function(){
   socket.emit("c2s_leave");
   socket.disconnect();
@@ -152,19 +156,26 @@ function toggleUtil(){
 
 
 function toggleForm(){
-    if(IAM.isEnter){
-        $("#chatForm").css("display", "none");
-        $("#enterForm").css("display", "inline");
-    }else{
-        $("#chatForm").css("display", "inline");
-        $("#enterForm").css("display", "none");
-    }
+  if(IAM.isEnter){
+    $("#chatForm").css("display", "none");
+    $("#enterForm").css("display", "inline");
+    $("#disconnect").prop('disabled', true);
+  }else{
+    $("#chatForm").css("display", "inline");
+    $("#enterForm").css("display", "none");
+    $("#disconnect").prop('disabled', false);
+  }
 }
 
 function onDistChange(){
   var dist = $("#dist").val();
   console.log(dist);
   socket.emit("c2s_dist",{ token: IAM.token, dist: dist });
+}
+
+function validateMsgLength(){
+  if($("#msgForm").val().length > MAX_MSG_LENGTH) $("#msgError").text("メッセージが長すぎます");
+  else $("#msgError").empty();
 }
 
 function moveAvatar(id, x, y) {
