@@ -81,9 +81,6 @@ socket.on('disconnect', function () {
   }
 });
 
-socket.on("reconnect",function(){
-});
-
 function appendAvatar(id, color) {
   $("#field").append(`<div id=${id} class="avatar">${id}<div id=${id}-effect class="avatar-effect"></div></div>`);
   $(`#${id}`).css("background-color", color);
@@ -109,6 +106,7 @@ $("form").submit(function (e) {
     socket.emit("c2s_msg", { token: IAM.token, dist: dist, msg: message });
     $("#msgForm").val("");
   } else {
+    if(!socket.connected) socket.connect();
     var room = $("#roomForm").val();
     IAM.room = room;
     socket.emit("c2s_join", {token: IAM.token, room:room, color: genRandColor()});
@@ -131,9 +129,11 @@ document.getElementById("msgForm").addEventListener("input", validateMsgLength);
 
 $("#disconnect").click(function(){
   socket.emit("c2s_leave");
-  socket.disconnect();
   toggleForm();
   removeAvatar();
+  $("#chatLogs").empty();
+  IAM.isConnected = false;
+  IAM.isEnter = false;
 });
 
 

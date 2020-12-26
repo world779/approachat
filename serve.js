@@ -206,18 +206,18 @@ io.on("connection", function (socket) {
 
   socket.on("c2s_msg", function (data) {
     var msg = data.msg;
+    if(MEMBER[socket.id] == null) return;
     if(msg.length > MAX_MSG_LENGTH) return;
+    if(TOKENS[socket.id] != data.token) return;
     msg = xss(msg);
     var minDist = MEMBER[socket.id].dist;
-    if (TOKENS[socket.id] == data.token) {
-      var sender = MEMBER[socket.id];
-      io.to(sender.room).emit("s2c_talking", { id: sender.count, dist: minDist });
-      Object.keys(MEMBER).forEach(function(key) {
-        var member = MEMBER[key];
-        var dist = calcDist(member.x, member.y, sender.x, sender.y);
-        if(dist<minDist && member.room==sender.room)io.to(key).emit("s2c_msg", { msg: msg, color: sender.color });
-      }, MEMBER);
-    }
+    var sender = MEMBER[socket.id];
+    io.to(sender.room).emit("s2c_talking", { id: sender.count, dist: minDist });
+    Object.keys(MEMBER).forEach(function(key) {
+      var member = MEMBER[key];
+      var dist = calcDist(member.x, member.y, sender.x, sender.y);
+      if(dist<minDist && member.room==sender.room)io.to(key).emit("s2c_msg", { msg: msg, color: sender.color });
+    }, MEMBER);
   });
 
   socket.on("c2s_dist",function(data){
