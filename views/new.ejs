@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>部屋作成画面</title>
+  </head>
+  <body>
+    <h1>部屋作成画面</h1>
+
+    <ul>
+      <% if(typeof errors != 'undefined') { %> <% errors.forEach(error=>{ %>
+      <li><%= error.message %></li>
+      <% }) %> <% } %>
+    </ul>
+
+    <form action="/new" method="POST">
+      <div>
+        <label for="room_name1">部屋名：</label>
+        <input type="text" name="room_name" placeholder="部屋名" required />
+      </div>
+      <!-- <div>
+        <label for="room_name1">メールアドレス：</label>
+        <input
+          type="email"
+          name="email"
+          placeholder="メールアドレス"
+          required
+        />
+      </div> -->
+      <div>
+        <label>パスワード：</label>
+        <input
+          type="password"
+          name="room_password"
+          placeholder="部屋パスワード"
+          required
+        />
+      </div>
+      <div>
+        <label>パスワード確認：</label>
+        <input
+          type="room_password2"
+          name="room_password2"
+          placeholder="パスワード確認"
+          required
+        />
+      </div>
+      <div>
+        <input type="submit" value="New" />
+      </div>
+      <!-- <a href="/chats/login">ログイン画面はこちらから</a> -->
+    </form>
+  </body>
+</html>
