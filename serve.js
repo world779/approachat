@@ -20,6 +20,9 @@ require('dotenv').config();
 
 const SECRET_TOKEN = process.env.SECRET_TOKEN;
 
+const MIN_DIST = 50;
+const MAX_DIST = 1000;
+
 const MEMBER = {};
 const TOKENS = {};
 let MEMBER_COUNT = 1;
@@ -214,6 +217,8 @@ io.on("connection", function (socket) {
   });
 
   socket.on("c2s_dist",function(data){
+    if(data.dist < MIN_DIST) data.dist = MIN_DIST;
+    if(data.dist > MAX_DIST) data.dist = MAX_DIST;
     MEMBER[socket.id].dist = data.dist;
     io.to(MEMBER[socket.id].room).emit("s2c_dist", { id: MEMBER[socket.id].count, dist: data.dist });
   });
@@ -227,7 +232,7 @@ io.on("connection", function (socket) {
   });
 
   socket.on("c2s_leave", function(data){
-    var msg = MEMBER[socket.id].name + "さんが退出しました。";
+    var msg = "退出しました";
     io.to(MEMBER[socket.id].room).emit("s2c_leave", { id:MEMBER[socket.id].count, msg: msg, color: MEMBER[socket.id].color });
     delete MEMBER[socket.id];
   });

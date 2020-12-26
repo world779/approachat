@@ -77,7 +77,7 @@ socket.on('disconnect', function () {
     socketId: IAM.socketId,
     token: IAM.token
   }
-  changeLabel_out();
+  toggleForm();
   removeAvatar();
 })
 
@@ -87,6 +87,8 @@ socket.on("reconnect",function(){
 function appendAvatar(id, color) {
   $("#field").append(`<div id=${id} class="avatar">${id}<div id=${id}-effect class="avatar-effect"></div></div>`);
   $(`#${id}`).css("background-color", color);
+  $(`#${id}-effect`).css("border", "1px solid" + color);
+  console.log($(`#${id}-effect`).css("border"));
 }
 
 function removeAvatar() {
@@ -100,16 +102,16 @@ function appendMsg(text, color) {
 }
 
 $("form").submit(function (e) {
-  var message = $("#msgForm").val();
-  var selectRoom = $("#rooms").val();
   if (IAM.isEnter) {
     // メッセージを送る
+    var message = $("#msgForm").val();
     var dist = $("#dist").val();
     socket.emit("c2s_msg", { token: IAM.token, dist: dist, msg: message });
   } else {
-    IAM.room = $("#rooms").val();
-    socket.emit("c2s_join", {token: IAM.token, room: selectRoom, color: genRandColor()});
-    changeLabel();
+    var room = $("#roomForm").val();
+    IAM.room = room;
+    socket.emit("c2s_join", {token: IAM.token, room:room, color: genRandColor()});
+    toggleForm();
     IAM.isEnter = true;
   }
   e.preventDefault();
@@ -122,6 +124,13 @@ $("#field").click(function(e){
   var y = e.pageY - offset.top;
   socket.emit("c2s_move", { token: IAM.token, x: x, y: y });
 });
+
+$("#dist").change(onDistChange);
+$("#disconnect").click(function(){
+    socket.emit("c2s_leave");
+    socket.disconnect();
+});
+
 
 window.onresize = function(e){
   fetchField(window.innerWidth, window.innerHeight);
@@ -136,39 +145,21 @@ function toggleUtil(){
   utilIsOpen = !utilIsOpen;
 }
 
-function changeLabel() {
-  $(".roomLabel").remove();
-  $(".passLabel").remove();
-  $("#rooms").remove();
-  $("#pass").remove();
-  $("#sendButton").text("送信");
-  $(".form-row").append('<label class="nameLabel">コメント</label>');
-  $(".form-row").append('<input type="text" id="msgForm" class="form-control" autocomplete="off">');
-  $(".form-row").append('<label class="nameLabel" for="dist">伝わる距離</label>\n<input type="range" id="dist" class="form-control" min="1" max="1000" value="80" step="5">');
-  $("#container-util").append('<div class="text-right"><button type="button" class="btn btn-danger btn-sm" id="disconnect">退出する</button></div>');
-  $("#dist").change(onDistChange);
-  $("#disconnect").click(function(e){
-  socket.emit("c2s_leave");
-  socket.disconnect();
-});
-}
 
-function changeLabel_out() {
-  $(".nameLabel").remove();
-  $(".form-control").remove();
-  $(".dist").remove();
-  $(".form-control").remove();
-  $(".text-right").remove();
-  $("#sendButton").text("入室");
-  $(".form-row").append('<label class="roomLabel" for="rooms">部屋</label>');
-  $(".form-row").append('<input type="text" id="rooms" class="form-control" >');
-  $(".form-row").append('<label class="nameLabel">パスワード</label>');
-  $(".form-row").append('<input type="password" class="form-control form-pass" id="pass" maxlength="30">');
+function toggleForm(){
+    if(IAM.isEnter){
+        $("#chatForm").css("display", "none");
+        $("#enterForm").css("display", "inline");
+    }else{
+        $("#chatForm").css("display", "inline");
+        $("#enterForm").css("display", "none");
+    }
 }
 
 
 function onDistChange(){
   var dist = $("#dist").val();
+  console.log(dist);
   socket.emit("c2s_dist",{ token: IAM.token, dist: dist });
 }
 

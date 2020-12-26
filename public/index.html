@@ -25,19 +25,31 @@
     <body>
         <div id="container-util">
             <div class="text-center">
-                <form> 
+                <form id="enterForm">
                     <div class="form-row">
-                        <label class="roomLabel" for="rooms">部屋</label>
-                        <input type="text" id="rooms" class="form-control" >
-                        <label class="passLabel" for="msgForm">パスワード</label>
-                        <input type="password" class="form-control form-pass" id="pass" maxlength="30">
+                        <label class="roomLabel" for="roomForm">部屋</label>
+                        <input type="text" id="roomForm" class="form-control" >
+                        <label class="passLabel" for="passForm">パスワード</label>
+                        <input type="password" class="form-control form-pass" id="passForm" maxlength="30">
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block" id="sendButton">
+                    <button type="submit" class="btn btn-primary btn-block" id="enterButton">
                         入室
+                    </button>
+                </form>
+                <form id="chatForm">
+                    <div class="form-row">
+                        <label for="msgForm">メッセージ</label>
+                        <input type="text" id="msgForm" class="form-control" autocomplete="off">
+                    </div>
+                    <label class="nameLabel" for="dist">伝わる距離</label>
+                    <input type="range" id="dist" class="form-control" min="0" max="100" value="50">
+                    <button type="submit" class="btn btn-primary btn-block" id="sendButton">
+                        送信
                     </button>
                 </form>
             </div>
             <div id="chatLogs"></div>
+            <div class="text-right"><button type="button" class="btn btn-danger btn-sm" id="disconnect">退出する</button></div>
         </div>
         <div id="field"></div>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
