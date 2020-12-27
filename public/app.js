@@ -55,7 +55,7 @@ socket.on("initial_data", function (data) {
 });
 
 socket.on("s2c_join", function(data){
-  appendMsg(data.msg, data.color);
+  appendMsg("入室しました", data.color);
   appendAvatar(data.id, data.color);
   drawCurrentDist(data.id, data.dist);
   $(`#${data.id}`).css("transform",`translateX(${data.x}px) translateY(${data.y}px)`);
@@ -66,7 +66,7 @@ socket.on("s2c_move", function (data) {
 });
 
 socket.on("s2c_talking", function(data){
-  drawMsgRange(data.id, data,dist);
+  drawMsgRange(data.id, data.dist);
 });
 
 socket.on("s2c_dist",function(data){
@@ -84,8 +84,7 @@ socket.on('disconnect', function () {
 function appendAvatar(id, color) {
   $("#field").append(`<div id=${id} class="avatar">${id}<div id=${id}-effect class="avatar-effect"></div></div>`);
   $(`#${id}`).css("background-color", color);
-  $(`#${id}-effect`).css("border", "1px solid" + color);
-  console.log($(`#${id}-effect`).css("border"));
+  $(`#${id}-effect`).css("border", "1px solid " + color);
 }
 
 function removeAvatar() {
@@ -169,7 +168,6 @@ function toggleForm(){
 
 function onDistChange(){
   var dist = $("#dist").val();
-  console.log(dist);
   socket.emit("c2s_dist",{ token: IAM.token, dist: dist });
 }
 
@@ -204,7 +202,7 @@ function fetchField(width, height){
 function genRandColor(){
   var hue = Math.floor(Math.random()*10)*36;
   var sat = Math.floor(Math.random()*40)+25;
-  var color = `hsl(${hue}, 50%, ${sat}%)`;
+  var color = `hsla(${hue}, 50%, ${sat}%, 1)`;
 
   return color;
 }
@@ -218,7 +216,7 @@ function drawMsgRange(id, dist){
   tl
     .add({
       targets: effect,
-      backgroundColor: 'rgba(255, 0, 0, .1)',
+      backgroundColor: color.replace("rgb", "rgba").replace(")",", .1)") ,
       easing: 'linear'
     })
     .add({
