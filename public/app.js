@@ -9,13 +9,15 @@ const IAM = {
   isMoving : false
 }
 
+const MAX_MSG_LENGTH = 2000;
+
 var utilIsOpen = true;
 
 var socket = io.connect({ 
   query : {
     reconnect: false
   }
-}); // C02. ソケットへの接続
+});
 
 
 // C04. server_to_clientイベント・データを受信する
@@ -53,7 +55,7 @@ socket.on("initial_data", function (data) {
 });
 
 socket.on("s2c_join", function(data){
-  appendMsg(data.msg, data.color);
+  appendMsg("入室しました", data.color);
   appendAvatar(data.id, data.color);
   drawCurrentDist(data.id, data.dist);
   $(`#${data.id}`).css("transform",`translateX(${data.x}px) translateY(${data.y}px)`);
@@ -64,7 +66,7 @@ socket.on("s2c_move", function (data) {
 });
 
 socket.on("s2c_talking", function(data){
-  drawMsgRange(data.id, data,dist);
+  drawMsgRange(data.id, data.dist);
 });
 
 socket.on("s2c_dist",function(data){
@@ -77,16 +79,12 @@ socket.on('disconnect', function () {
     socketId: IAM.socketId,
     token: IAM.token
   }
-  changeLabel_out();
-  removeAvatar();
-})
-
-socket.on("reconnect",function(){
 });
 
 function appendAvatar(id, color) {
   $("#field").append(`<div id=${id} class="avatar">${id}<div id=${id}-effect class="avatar-effect"></div></div>`);
   $(`#${id}`).css("background-color", color);
+  $(`#${id}-effect`).css("border", "1px solid " + color);
 }
 
 function removeAvatar() {
@@ -100,16 +98,18 @@ function appendMsg(text, color) {
 }
 
 $("form").submit(function (e) {
-  var message = $("#msgForm").val();
-  var selectRoom = $("#rooms").val();
   if (IAM.isEnter) {
     // メッセージを送る
+    var message = $("#msgForm").val();
     var dist = $("#dist").val();
     socket.emit("c2s_msg", { token: IAM.token, dist: dist, msg: message });
+    $("#msgForm").val("");
   } else {
-    IAM.room = $("#rooms").val();
-    socket.emit("c2s_join", {token: IAM.token, room: selectRoom, color: genRandColor()});
-    changeLabel();
+    if(!socket.connected) socket.connect();
+    var room = $("#roomForm").val();
+    IAM.room = room;
+    socket.emit("c2s_join", {token: IAM.token, room:room, color: genRandColor()});
+    toggleForm();
     IAM.isEnter = true;
   }
   e.preventDefault();
@@ -123,8 +123,25 @@ $("#field").click(function(e){
   socket.emit("c2s_move", { token: IAM.token, x: x, y: y });
 });
 
+$("#dist").change(onDistChange);
+document.getElementById("msgForm").addEventListener("input", validateMsgLength);
+
+$("#disconnect").click(function(){
+  socket.emit("c2s_leave");
+  toggleForm();
+  removeAvatar();
+  $("#chatLogs").empty();
+  IAM.isConnected = false;
+  IAM.isEnter = false;
+});
+
+
 window.onresize = function(e){
   fetchField(window.innerWidth, window.innerHeight);
+};
+
+window.onbeforeunload = function(){
+  socket.emit("c2s_leave");
 };
 
 function toggleUtil(){
@@ -136,40 +153,27 @@ function toggleUtil(){
   utilIsOpen = !utilIsOpen;
 }
 
-function changeLabel() {
-  $(".roomLabel").remove();
-  $(".passLabel").remove();
-  $("#rooms").remove();
-  $("#pass").remove();
-  $("#sendButton").text("送信");
-  $(".form-row").append('<label class="nameLabel">コメント</label>');
-  $(".form-row").append('<input type="text" id="msgForm" class="form-control" autocomplete="off">');
-  $(".form-row").append('<label class="nameLabel" for="dist">伝わる距離</label>\n<input type="range" id="dist" class="form-control" min="1" max="1000" value="80" step="5">');
-  $("#container-util").append('<div class="text-right"><button type="button" class="btn btn-danger btn-sm" id="disconnect">退出する</button></div>');
-  $("#dist").change(onDistChange);
-  $("#disconnect").click(function(e){
-  socket.emit("c2s_leave");
-  socket.disconnect();
-});
-}
 
-function changeLabel_out() {
-  $(".nameLabel").remove();
-  $(".form-control").remove();
-  $(".dist").remove();
-  $(".form-control").remove();
-  $(".text-right").remove();
-  $("#sendButton").text("入室");
-  $(".form-row").append('<label class="roomLabel" for="rooms">部屋</label>');
-  $(".form-row").append('<input type="text" id="rooms" class="form-control" >');
-  $(".form-row").append('<label class="nameLabel">パスワード</label>');
-  $(".form-row").append('<input type="password" class="form-control form-pass" id="pass" maxlength="30">');
+function toggleForm(){
+  if(IAM.isEnter){
+    $("#chatForm").css("display", "none");
+    $("#enterForm").css("display", "inline");
+    $("#disconnect").prop('disabled', true);
+  }else{
+    $("#chatForm").css("display", "inline");
+    $("#enterForm").css("display", "none");
+    $("#disconnect").prop('disabled', false);
+  }
 }
-
 
 function onDistChange(){
   var dist = $("#dist").val();
   socket.emit("c2s_dist",{ token: IAM.token, dist: dist });
+}
+
+function validateMsgLength(){
+  if($("#msgForm").val().length > MAX_MSG_LENGTH) $("#msgError").text("メッセージが長すぎます");
+  else $("#msgError").empty();
 }
 
 function moveAvatar(id, x, y) {
@@ -198,7 +202,7 @@ function fetchField(width, height){
 function genRandColor(){
   var hue = Math.floor(Math.random()*10)*36;
   var sat = Math.floor(Math.random()*40)+25;
-  var color = `hsl(${hue}, 50%, ${sat}%)`;
+  var color = `hsla(${hue}, 50%, ${sat}%, 1)`;
 
   return color;
 }
@@ -209,21 +213,10 @@ function drawMsgRange(id, dist){
   var tl = anime.timeline({
     duration: 500,
   });
-  tl.add({
-    targets: avatar,
-    scale: scale,
-    opacity: 0.3,
-    easing: "linear",
-  }).add({
-    targets: avatar,
-    scale: 1,
-    opacity: 1,
-    easing: "easeInElastic(1, .6)",
-  });
   tl
     .add({
       targets: effect,
-      backgroundColor: 'rgba(255, 0, 0, .1)',
+      backgroundColor: color.replace("rgb", "rgba").replace(")",", .1)") ,
       easing: 'linear'
     })
     .add({
