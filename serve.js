@@ -46,6 +46,80 @@ app.get("/", (req, res) => {
   res.sendFile(DOCUMENT_ROOT + "/index.html");
 });
 
+app.get("/chat/*", (req, res) => {
+  res.sendFile(DOCUMENT_ROOT + "/chat.html");
+});
+
+app.get("/new",  (req, res) => {
+  res.render("new");
+});
+
+app.post("/new", async (req, res) => {
+  let { room_name, room_password, room_password2 } = req.body;
+
+  console.log({
+    room_name,
+    room_password,
+    room_password2,
+  });
+
+  let errors = [];
+
+  if (!room_name || !room_password || !room_password2) {
+    errors.push({ message: "すべての項目を入力してください" });
+  }
+
+  if (room_password.length < 6) {
+    errors.push({ message: "パスワードは最低6文字にしてください" });
+  }
+
+  if (room_password != room_password2) {
+    errors.push({ message: "パスワードが一致しません" });
+  }
+
+  if (errors.length > 0) {
+    res.render("new", { errors });
+  } else {
+    let room_hashedPassword = await bcrypt.hash(room_password, 10);
+    console.log(room_hashedPassword);
+
+    pool.query(
+      `SELECT * FROM chats
+        WHERE room_name = $1`,
+      [room_name],
+      (err, results) => {
+        if (err) {
+          console.log(err);
+        }
+        // console.log(results.rows);
+
+        if (results.rows.length > 0) {
+          errors.push({ message: "この部屋名は既に登録されています" });
+          res.render("new", { errors });
+        } else {
+          pool.query(
+            `INSERT INTO users (room_name, room_password)
+            VALUES ($1, $2)
+            RETURNING id, room_password`,
+            [room_name, room_hashedPassword],
+            (err, results) => {
+              if (err) {
+                throw err;
+              }
+              console.log(results.rows);
+              req.flash(
+                "success_msg",
+                "部屋が作成されました。"
+              );
+              res.redirect("/chat/"+room_name);
+            }
+          );
+        }
+      }
+    );
+  }
+});
+
 app.get("/users/register", checkAuthenticated, (req, res) => {
   res.render("register");
 });
