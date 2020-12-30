@@ -294,6 +294,7 @@ io.on("connection", function (socket) {
   });
 
   socket.on("c2s_dist",function(data){
+    if(TOKENS[socket.id] != data.token) return;
     var dist = data.dist;
     if(dist > 100) dist = 100;
     dist = dist * MAX_DIST / 100 + MIN_DIST
@@ -302,14 +303,14 @@ io.on("connection", function (socket) {
   });
 
   socket.on("c2s_move", function(data){
-    if(TOKENS[socket.id] == data.token){
-      MEMBER[socket.id].x = data.x;
-      MEMBER[socket.id].y = data.y;
-      io.to(MEMBER[socket.id].room).emit("s2c_move", { id: MEMBER[socket.id].count, x:MEMBER[socket.id].x, y:MEMBER[socket.id].y });
-    }
+    if(TOKENS[socket.id] != data.token) return;
+    MEMBER[socket.id].x = data.x;
+    MEMBER[socket.id].y = data.y;
+    io.to(MEMBER[socket.id].room).emit("s2c_move", { id: MEMBER[socket.id].count, x:MEMBER[socket.id].x, y:MEMBER[socket.id].y });
   });
 
   socket.on("c2s_leave", function(data){
+    if(TOKENS[socket.id] != data.token) return;
     try{
       var msg = "退出しました";
       io.to(MEMBER[socket.id].room).emit("s2c_leave", { id:MEMBER[socket.id].count, msg: msg, color: MEMBER[socket.id].color });
@@ -317,9 +318,6 @@ io.on("connection", function (socket) {
     }catch{
       console.log("未入室のユーザが退出しました")
     }
-  });
-
-  socket.on("disconnect", function () {
   });
 });
 

@@ -20,7 +20,6 @@ var socket = io.connect({
 });
 
 
-// C04. server_to_clientイベント・データを受信する
 socket.on("s2c_msg", function (data) {
   appendMsg(data.msg, data.color);
 });
@@ -81,6 +80,60 @@ socket.on('disconnect', function () {
   }
 });
 
+window.onload = function(){
+  console.log("loaded");
+  var url = location.pathname;
+  var roomName = url.replace("/chat/", "");
+  document.getElementById("roomForm").value = roomName;
+
+  $("form").submit(function (e) {
+    if (IAM.isEnter) {
+      // メッセージを送る
+      var message = $("#msgForm").val();
+      var dist = $("#dist").val();
+      socket.emit("c2s_msg", { token: IAM.token, dist: dist, msg: message });
+      $("#msgForm").val("");
+    } else {
+      if(!socket.connected) socket.connect();
+      var room = $("#roomForm").val();
+      IAM.room = room;
+      socket.emit("c2s_join", {token: IAM.token, room:room, color: genRandColor()});
+      toggleForm();
+      IAM.isEnter = true;
+    }
+    e.preventDefault();
+  });
+
+  $("#field").click(function(e){
+    if(IAM.isMoving) return;
+    var offset = $(this).offset();
+    var x = e.pageX - offset.left;
+    var y = e.pageY - offset.top;
+    socket.emit("c2s_move", { token: IAM.token, x: x, y: y });
+  });
+
+  $("#dist").change(onDistChange);
+  document.getElementById("msgForm").addEventListener("input", validateMsgLength);
+
+  $("#disconnect").click(function(){
+    socket.emit("c2s_leave", { token: IAM.token });
+    toggleForm();
+    removeAvatar();
+    $("#chatLogs").empty();
+    IAM.isConnected = false;
+    IAM.isEnter = false;
+  });
+}
+
+window.onresize = function(){
+  fetchField(window.innerWidth, window.innerHeight);
+};
+
+window.onbeforeunload = function(){
+  socket.emit("c2s_leave", { token: IAM.token });
+};
+
+
 function appendAvatar(id, color) {
   $("#field").append(`<div id=${id} class="avatar">${id}<div id=${id}-effect class="avatar-effect"></div></div>`);
   $(`#${id}`).css("background-color", color);
@@ -96,53 +149,6 @@ function appendMsg(text, color) {
   var log = document.getElementById("chatLogs");
   log.scrollTop = log.scrollHeight;
 }
-
-$("form").submit(function (e) {
-  if (IAM.isEnter) {
-    // メッセージを送る
-    var message = $("#msgForm").val();
-    var dist = $("#dist").val();
-    socket.emit("c2s_msg", { token: IAM.token, dist: dist, msg: message });
-    $("#msgForm").val("");
-  } else {
-    if(!socket.connected) socket.connect();
-    var room = $("#roomForm").val();
-    IAM.room = room;
-    socket.emit("c2s_join", {token: IAM.token, room:room, color: genRandColor()});
-    toggleForm();
-    IAM.isEnter = true;
-  }
-  e.preventDefault();
-});
-
-$("#field").click(function(e){
-  if(IAM.isMoving) return;
-  var offset = $(this).offset();
-  var x = e.pageX - offset.left;
-  var y = e.pageY - offset.top;
-  socket.emit("c2s_move", { token: IAM.token, x: x, y: y });
-});
-
-$("#dist").change(onDistChange);
-document.getElementById("msgForm").addEventListener("input", validateMsgLength);
-
-$("#disconnect").click(function(){
-  socket.emit("c2s_leave");
-  toggleForm();
-  removeAvatar();
-  $("#chatLogs").empty();
-  IAM.isConnected = false;
-  IAM.isEnter = false;
-});
-
-
-window.onresize = function(e){
-  fetchField(window.innerWidth, window.innerHeight);
-};
-
-window.onbeforeunload = function(){
-  socket.emit("c2s_leave");
-};
 
 function toggleUtil(){
   const util = document.getElementById("container-util");
