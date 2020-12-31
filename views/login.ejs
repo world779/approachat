@@ -9,9 +9,9 @@
             />
         <title>ログイン画面</title>
     </head>
-    <body class="text-center px-md-5 pt-5">
-        <div class="px-sm-5">
-            <h1>ログイン</h1>
+    <body class="px-md-5 pt-5">
+        <div class="px-sm-5 container">
+            <h1 class="text-center my-3">ログイン</h1>
 
             <ul>
                 <% if(messages.success_msg) { %>
@@ -26,30 +26,40 @@
             </ul>
 
             <form action="/users/login" method="POST">
-                <div class="form-group">
-                    <label for="email">メールアドレス</label>
-                    <input
-                        class="form-control"
-                        type="email"
-                        name="email"
-                        placeholder="メールアドレス"
-                        required
-                        />
+                <div class="form-group row">
+                    <div class="col-md-3">
+                        <label for="email">メールアドレス</label>
+                    </div>
+                    <div class="col-md">
+                        <input
+                            class="form-control"
+                            type="email"
+                            name="email"
+                            placeholder="メールアドレス"
+                            required
+                            />
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="password">パスワード</label>
-                    <input
-                        class="form-control"
-                        type="password"
-                        name="password"
-                        placeholder="パスワード"
-                        required
-                        />
+                <div class="form-group row">
+                    <div class="col-md-3">
+                        <label for="password">パスワード</label>
+                    </div>
+                    <div class="col-md">
+                        <input
+                            class="form-control"
+                            type="password"
+                            name="password"
+                            placeholder="パスワード"
+                            required
+                            />
+                    </div>
                 </div>
                 <div>
                     <input type="submit" class="btn btn-primary btn-block mb-3" value="Login" />
                 </div>
-                <a href="/users/register">登録画面はこちらから</a>
+                <div class="text-center">
+                    <a href="/users/register">登録画面はこちらから</a>
+                </div>
             </form>
         </div>
     </body>
