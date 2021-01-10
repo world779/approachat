@@ -68,7 +68,7 @@ app.get("/chat/*", (req, res) => {
         res.send("そのような部屋はありません");
       }
     });
-}
+});
 
 app.get("/new",  (req, res) => {
   res.render("new");
