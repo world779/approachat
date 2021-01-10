@@ -12,6 +12,7 @@ const IAM = {
 const MAX_MSG_LENGTH = 2000;
 
 var utilIsOpen = true;
+var curScale = 1;
 
 var socket = io.connect({ 
   query : {
@@ -107,8 +108,8 @@ window.onload = function(){
   $("#field").click(function(e){
     if(IAM.isMoving) return;
     var offset = $(this).offset();
-    var x = e.pageX - offset.left;
-    var y = e.pageY - offset.top;
+    var x = e.pageX/curScale - offset.left;
+    var y = e.pageY/curScale - offset.top;
     socket.emit("c2s_move", { token: IAM.token, x: x, y: y });
   });
 
@@ -123,11 +124,27 @@ window.onload = function(){
     IAM.isConnected = false;
     IAM.isEnter = false;
   });
-}
 
-window.onresize = function(){
-  fetchField(window.innerWidth, window.innerHeight);
-};
+  $("#zoomIn").click(function(){
+    const field = document.getElementById("field");
+    anime({
+      targets: field,
+      zoom: `${100*curScale*1.2}%`,
+      easing: "linear"
+    });
+    curScale*=1.2;
+  });
+
+  $("#zoomOut").click(function(){
+    const field = document.getElementById("field");
+    anime({
+      targets: field,
+      zoom: `${100*curScale/1.2}%`,
+      easing: "linear"
+    });
+    curScale/=1.2;
+  });
+}
 
 window.onbeforeunload = function(){
   socket.emit("c2s_leave", { token: IAM.token });
@@ -184,7 +201,6 @@ function validateMsgLength(){
 
 function moveAvatar(id, x, y) {
   const avatar = document.getElementById(id);
-  fetchField(x, y);
   if(id = IAM.id) IAM.isMoving = true;
   anime({
     targets: avatar,
@@ -195,14 +211,6 @@ function moveAvatar(id, x, y) {
       if(id = IAM.id) IAM.isMoving = false;
     }
   });
-}
-
-function fetchField(width, height){
-  var fieldSize = $("#field").css(["min-width", "min-height"]);
-  var fieldWidth = parseInt(fieldSize["min-width"], 10);
-  var fieldHeight = parseInt(fieldSize["min-height"], 10);
-  $("#field").css({"min-width": Math.max(fieldWidth, width), "min-height": Math.max(fieldHeight, height)});
-
 }
 
 function genRandColor(){
