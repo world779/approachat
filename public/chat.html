@@ -10,7 +10,7 @@
             />
         <link
             rel="stylesheet"
-            href="../index.css"
+            href="../chat.css"
             />
         <script src="https://www.google.com/recaptcha/api.js"></script>
         <script>
@@ -50,11 +50,14 @@
                 </form>
             </div>
             <div class="my-3" id="chatLogs"></div>
-            <div class="text-right"><button type="button" class="btn btn-danger btn-sm" id="disconnect" disabled>退出する</button></div>
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-secondary" id="zoomIn">拡大</button>
+                <button type="button" class="btn btn-secondary" id="zoomOut">縮小</button>
+                <button type="button" class="btn btn-danger" id="disconnect" disabled>退出</button>
+            </div>
         </div>
         <div id="field"></div>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
         <script type="text/javascript" src="/socket.io/socket.io.js"></script>
