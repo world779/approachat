@@ -16,7 +16,7 @@ const crypto = require("crypto");
 const { report } = require("process");
 const DOCUMENT_ROOT = __dirname + "/public";
 
-require('dotenv').config();
+require("dotenv").config();
 
 const SECRET_TOKEN = process.env.SECRET_TOKEN;
 
@@ -56,6 +56,10 @@ app.get("/users/login", checkAuthenticated, (req, res) => {
 
 app.get("/users/dashboard", checkNotAutheticated, (req, res) => {
   res.render("dashboard", { user: req.user.name });
+});
+
+app.get("/users/index", checkNotAutheticated, (req, res) => {
+  res.render("index", { user: req.user.name });
 });
 
 app.get("/users/logout", (req, res) => {
@@ -134,7 +138,7 @@ app.post("/users/register", async (req, res) => {
 app.post(
   "/users/login",
   passport.authenticate("local", {
-    successRedirect: "/users/dashboard",
+    successRedirect: "/users/index",
     failureRedirect: "/users/login",
     failureFlash: true,
   })
@@ -142,7 +146,7 @@ app.post(
 
 function checkAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
-    return res.redirect("/users/dashboard");
+    return res.redirect("/users/index");
   }
   next();
 }
@@ -161,27 +165,39 @@ app.use("/animejs", express.static(__dirname + "/node_modules/animejs/lib/"));
 io.on("connection", function (socket) {
   (() => {
     // トークンを作成
-        const data=socket.handshake.query;
-        if(data.reconnect=="true"){
-            if(TOKENS[data.socketId] == data.token){
-                MEMBER[socket.id] = MEMBER[data.socketId];
-                TOKENS[socket.id] = data.token;
-                socket.join(MEMBER[socket.id].room);
-                delete MEMBER[data.socketId];
-                delete TOKENS[data.socketId];
-            }
-        }else{
-            const token = crypto.createHash("sha1").update(SECRET_TOKEN + socket.id).digest('hex');
-            // ユーザーリストに追加
-            MEMBER[socket.id] = { room:null, count:MEMBER_COUNT, x: 0, y: 0, color:null, dist: 0};
-            TOKENS[socket.id] = token;
-            MEMBER_COUNT++;
+    const data = socket.handshake.query;
+    if (data.reconnect == "true") {
+      if (TOKENS[data.socketId] == data.token) {
+        MEMBER[socket.id] = MEMBER[data.socketId];
+        TOKENS[socket.id] = data.token;
+        socket.join(MEMBER[socket.id].room);
+        delete MEMBER[data.socketId];
+        delete TOKENS[data.socketId];
+      }
+    } else {
+      const token = crypto
+        .createHash("sha1")
+        .update(SECRET_TOKEN + socket.id)
+        .digest("hex");
+      // ユーザーリストに追加
+      MEMBER[socket.id] = {
+        room: null,
+        count: MEMBER_COUNT,
+        x: 0,
+        y: 0,
+        color: null,
+        dist: 0,
+      };
+      TOKENS[socket.id] = token;
+      MEMBER_COUNT++;
 
-            // 本人にトークンを送付
-            io.to(socket.id).emit("token", { token: token, id:MEMBER[socket.id].count });
-        }
-    })();
-
+      // 本人にトークンを送付
+      io.to(socket.id).emit("token", {
+        token: token,
+        id: MEMBER[socket.id].count,
+      });
+    }
+  })();
 
   // ルームに入室されたらsocketをroomにjoinさせてメンバーリストにもそれを反映
   socket.on("c2s_join", function (data) {
@@ -195,7 +211,14 @@ io.on("connection", function (socket) {
       var y = Math.floor(Math.random() * 50) * 10 + 50;
       MEMBER[socket.id].x = x;
       MEMBER[socket.id].y = y;
-      io.to(MEMBER[socket.id].room).emit("s2c_join", { id: MEMBER[socket.id].count, color: data.color, x:x, y:y, dist: 80, msg: msg });
+      io.to(MEMBER[socket.id].room).emit("s2c_join", {
+        id: MEMBER[socket.id].count,
+        color: data.color,
+        x: x,
+        y: y,
+        dist: 80,
+        msg: msg,
+      });
     }
   });
   // メッセージがきたら名前とメッセージをくっつけて送り返す
@@ -204,36 +227,50 @@ io.on("connection", function (socket) {
     var minDist = data.dist;
     if (TOKENS[socket.id] == data.token) {
       var sender = MEMBER[socket.id];
-      io.to(sender.room).emit("s2c_talking", { id: sender.count, dist: minDist });
-      Object.keys(MEMBER).forEach(function(key) {
+      io.to(sender.room).emit("s2c_talking", {
+        id: sender.count,
+        dist: minDist,
+      });
+      Object.keys(MEMBER).forEach(function (key) {
         var member = MEMBER[key];
         var dist = calcDist(member.x, member.y, sender.x, sender.y);
-        if(dist<minDist && member.room==sender.room)io.to(key).emit("s2c_msg", { msg: data.msg, color: sender.color });
+        if (dist < minDist && member.room == sender.room)
+          io.to(key).emit("s2c_msg", { msg: data.msg, color: sender.color });
       }, MEMBER);
     }
   });
 
-  socket.on("c2s_dist",function(data){
+  socket.on("c2s_dist", function (data) {
     MEMBER[socket.id].dist = data.dist;
-    io.to(MEMBER[socket.id].room).emit("s2c_dist", { id: MEMBER[socket.id].count, dist: data.dist });
+    io.to(MEMBER[socket.id].room).emit("s2c_dist", {
+      id: MEMBER[socket.id].count,
+      dist: data.dist,
+    });
   });
 
-  socket.on("c2s_move", function(data){
-      if(TOKENS[socket.id] == data.token){
-          MEMBER[socket.id].x = data.x;
-          MEMBER[socket.id].y = data.y;
-          io.to(MEMBER[socket.id].room).emit("s2c_move", { id: MEMBER[socket.id].count, x:MEMBER[socket.id].x, y:MEMBER[socket.id].y });
-      }
+  socket.on("c2s_move", function (data) {
+    if (TOKENS[socket.id] == data.token) {
+      MEMBER[socket.id].x = data.x;
+      MEMBER[socket.id].y = data.y;
+      io.to(MEMBER[socket.id].room).emit("s2c_move", {
+        id: MEMBER[socket.id].count,
+        x: MEMBER[socket.id].x,
+        y: MEMBER[socket.id].y,
+      });
+    }
   });
 
-  socket.on("c2s_leave", function(data){
+  socket.on("c2s_leave", function (data) {
     var msg = MEMBER[socket.id].name + "さんが退出しました。";
-    io.to(MEMBER[socket.id].room).emit("s2c_leave", { id:MEMBER[socket.id].count, msg: msg, color: MEMBER[socket.id].color });
+    io.to(MEMBER[socket.id].room).emit("s2c_leave", {
+      id: MEMBER[socket.id].count,
+      msg: msg,
+      color: MEMBER[socket.id].color,
+    });
     delete MEMBER[socket.id];
   });
 
-  socket.on("disconnect", function () {
-  });
+  socket.on("disconnect", function () {});
 });
 
 function calcDist(x1, y1, x2, y2) {
