@@ -43,8 +43,8 @@ socket.on("token", function(data){
   }
 });
 
-socket.on("initial_data", function (data) {
-  Object.keys(data.data).forEach(function (key) {
+  socket.on("initial_data", function (data) {
+    Object.keys(data.data).forEach(function (key) {
     var member = this[key];
     if(member.room == IAM.room){
       appendAvatar(member.count, member.color);
@@ -97,8 +97,9 @@ window.onload = function(){
     } else {
       if(!socket.connected) socket.connect();
       var room = $("#roomForm").val();
+      var pass = $("#passForm").val();
       IAM.room = room;
-      socket.emit("c2s_join", {token: IAM.token, room:room, color: genRandColor()});
+      socket.emit("c2s_join", {token: IAM.token, room:room, color: genRandColor(), password: pass });
       toggleForm();
       IAM.isEnter = true;
     }
