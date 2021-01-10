@@ -90,7 +90,7 @@ app.post("/new", async (req, res) => {
 
     pool.query(
       `SELECT * FROM chats
-        WHERE room_name = $1`,
+        WHERE name = $1`,
       [room_name],
       (err, results) => {
         if (err) {
@@ -103,9 +103,9 @@ app.post("/new", async (req, res) => {
           res.render("new", { errors });
         } else {
           pool.query(
-            `INSERT INTO users (room_name, room_password)
+            `INSERT INTO chats (name, password)
             VALUES ($1, $2)
-            RETURNING id, room_password`,
+            RETURNING name`,
             [room_name, room_hashedPassword],
             (err, results) => {
               if (err) {
