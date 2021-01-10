@@ -76,11 +76,11 @@ app.get("/chat/*", (req, res) => {
     });
 });
 
-app.get("/new", (req, res) => {
+app.get("/new", checkNotAutheticated, (req, res) => {
   res.render("new");
 });
 
-app.post("/new", async (req, res) => {
+app.post("/new", checkNotAutheticated, async (req, res) => {
   let { room_name, room_password, room_password2 } = req.body;
 
   console.log({
