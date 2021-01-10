@@ -5,6 +5,13 @@ const bcrypt = require("bcrypt");
 const session = require("express-session");
 const flash = require("express-flash");
 const passport = require("passport");
+const xss = require("xss");
+var fs = require("fs");
+var path = require("path");
+var mime = {
+  ".html": "text/html",
+  ".css": "text/css",
+};
 
 const initializePassport = require("./passportConfig");
 
@@ -19,6 +26,10 @@ const DOCUMENT_ROOT = __dirname + "/public";
 require("dotenv").config();
 
 const SECRET_TOKEN = process.env.SECRET_TOKEN;
+
+const MIN_DIST = 50;
+const MAX_DIST = 500;
+const MAX_MSG_LENGTH = 2000;
 
 const MEMBER = {};
 const TOKENS = {};
@@ -44,6 +55,77 @@ app.use(flash());
 
 app.get("/", (req, res) => {
   res.sendFile(DOCUMENT_ROOT + "/index.html");
+});
+
+app.get("/chat/*", (req, res) => {
+  res.sendFile(DOCUMENT_ROOT + "/chat.html");
+});
+
+app.get("/new", (req, res) => {
+  res.render("new");
+});
+
+app.post("/new", async (req, res) => {
+  let { room_name, room_password, room_password2 } = req.body;
+
+  console.log({
+    room_name,
+    room_password,
+    room_password2,
+  });
+
+  let errors = [];
+
+  if (!room_name || !room_password || !room_password2) {
+    errors.push({ message: "すべての項目を入力してください" });
+  }
+
+  if (room_password.length < 6) {
+    errors.push({ message: "パスワードは最低6文字にしてください" });
+  }
+
+  if (room_password != room_password2) {
+    errors.push({ message: "パスワードが一致しません" });
+  }
+
+  if (errors.length > 0) {
+    res.render("new", { errors });
+  } else {
+    let room_hashedPassword = await bcrypt.hash(room_password, 10);
+    console.log(room_hashedPassword);
+
+    pool.query(
+      `SELECT * FROM chats
+        WHERE room_name = $1`,
+      [room_name],
+      (err, results) => {
+        if (err) {
+          console.log(err);
+        }
+        // console.log(results.rows);
+
+        if (results.rows.length > 0) {
+          errors.push({ message: "この部屋名は既に登録されています" });
+          res.render("new", { errors });
+        } else {
+          pool.query(
+            `INSERT INTO users (room_name, room_password)
+            VALUES ($1, $2)
+            RETURNING id, room_password`,
+            [room_name, room_hashedPassword],
+            (err, results) => {
+              if (err) {
+                throw err;
+              }
+              console.log(results.rows);
+              req.flash("success_msg", "部屋が作成されました。");
+              res.redirect("/chat/" + room_name);
+            }
+          );
+        }
+      }
+    );
+  }
 });
 
 app.get("/users/register", checkAuthenticated, (req, res) => {
@@ -138,7 +220,7 @@ app.post("/users/register", async (req, res) => {
 app.post(
   "/users/login",
   passport.authenticate("local", {
-    successRedirect: "/users/index",
+    successRedirect: "/users/dashboard",
     failureRedirect: "/users/login",
     failureFlash: true,
   })
@@ -206,7 +288,6 @@ io.on("connection", function (socket) {
       MEMBER[socket.id].room = data.room;
       MEMBER[socket.id].color = data.color;
       socket.join(data.room);
-      var msg = "入室がありました";
       var x = Math.floor(Math.random() * 50) * 10 + 250;
       var y = Math.floor(Math.random() * 50) * 10 + 50;
       MEMBER[socket.id].x = x;
@@ -216,61 +297,65 @@ io.on("connection", function (socket) {
         color: data.color,
         x: x,
         y: y,
-        dist: 80,
-        msg: msg,
+        dist: MIN_DIST + MAX_DIST / 200,
       });
-    }
-  });
-  // メッセージがきたら名前とメッセージをくっつけて送り返す
-  socket.on("c2s_msg", function (data) {
-    // S06. server_to_clientイベント・データを送信する
-    var minDist = data.dist;
-    if (TOKENS[socket.id] == data.token) {
-      var sender = MEMBER[socket.id];
-      io.to(sender.room).emit("s2c_talking", {
-        id: sender.count,
-        dist: minDist,
-      });
-      Object.keys(MEMBER).forEach(function (key) {
-        var member = MEMBER[key];
-        var dist = calcDist(member.x, member.y, sender.x, sender.y);
-        if (dist < minDist && member.room == sender.room)
-          io.to(key).emit("s2c_msg", { msg: data.msg, color: sender.color });
-      }, MEMBER);
     }
   });
 
+  socket.on("c2s_msg", function (data) {
+    var msg = data.msg;
+    if (MEMBER[socket.id] == null) return;
+    if (msg.length > MAX_MSG_LENGTH) return;
+    if (TOKENS[socket.id] != data.token) return;
+    msg = xss(msg);
+    var minDist = MEMBER[socket.id].dist;
+    var sender = MEMBER[socket.id];
+    io.to(sender.room).emit("s2c_talking", { id: sender.count, dist: minDist });
+    Object.keys(MEMBER).forEach(function (key) {
+      var member = MEMBER[key];
+      var dist = calcDist(member.x, member.y, sender.x, sender.y);
+      if (dist < minDist && member.room == sender.room)
+        io.to(key).emit("s2c_msg", { msg: msg, color: sender.color });
+    }, MEMBER);
+  });
+
   socket.on("c2s_dist", function (data) {
-    MEMBER[socket.id].dist = data.dist;
+    if (TOKENS[socket.id] != data.token) return;
+    var dist = data.dist;
+    if (dist > 100) dist = 100;
+    dist = (dist * MAX_DIST) / 100 + MIN_DIST;
+    MEMBER[socket.id].dist = dist;
     io.to(MEMBER[socket.id].room).emit("s2c_dist", {
       id: MEMBER[socket.id].count,
-      dist: data.dist,
+      dist: dist,
     });
   });
 
   socket.on("c2s_move", function (data) {
-    if (TOKENS[socket.id] == data.token) {
-      MEMBER[socket.id].x = data.x;
-      MEMBER[socket.id].y = data.y;
-      io.to(MEMBER[socket.id].room).emit("s2c_move", {
-        id: MEMBER[socket.id].count,
-        x: MEMBER[socket.id].x,
-        y: MEMBER[socket.id].y,
-      });
-    }
+    if (TOKENS[socket.id] != data.token) return;
+    MEMBER[socket.id].x = data.x;
+    MEMBER[socket.id].y = data.y;
+    io.to(MEMBER[socket.id].room).emit("s2c_move", {
+      id: MEMBER[socket.id].count,
+      x: MEMBER[socket.id].x,
+      y: MEMBER[socket.id].y,
+    });
   });
 
   socket.on("c2s_leave", function (data) {
-    var msg = MEMBER[socket.id].name + "さんが退出しました。";
-    io.to(MEMBER[socket.id].room).emit("s2c_leave", {
-      id: MEMBER[socket.id].count,
-      msg: msg,
-      color: MEMBER[socket.id].color,
-    });
-    delete MEMBER[socket.id];
+    if (TOKENS[socket.id] != data.token) return;
+    try {
+      var msg = "退出しました";
+      io.to(MEMBER[socket.id].room).emit("s2c_leave", {
+        id: MEMBER[socket.id].count,
+        msg: msg,
+        color: MEMBER[socket.id].color,
+      });
+      delete MEMBER[socket.id];
+    } catch {
+      console.log("未入室のユーザが退出しました");
+    }
   });
-
-  socket.on("disconnect", function () {});
 });
 
 function calcDist(x1, y1, x2, y2) {

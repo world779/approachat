@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link
+            rel="stylesheet"
+            href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+            />
+        <title>部屋作成画面</title>
+    </head>
+    <body class="px-md-5 pt-5">
+        <div class="container px-sm-5">
+            <h1 class="text-center m-3">部屋を作成</h1>
+
+            <ul>
+                <% if(typeof errors != 'undefined') { %> <% errors.forEach(error=>{ %>
+                <li><%= error.message %></li>
+                <% }) %> <% } %>
+            </ul>
+
+            <form action="/new" method="POST">
+                <div class="form-group row">
+                        <div class="col-md-3">
+                            <label for="room_name1">部屋名：</label>
+                        </div>
+                        <div class="col-md">
+                    <input type="text" class="form-control" name="room_name" placeholder="部屋名" required />
+                        </div>
+                </div>
+                <!-- <div>
+                    <label for="room_name1">メールアドレス：</label>
+                    <input
+                    type="email"
+                    name="email"
+                    placeholder="メールアドレス"
+                    required
+                    />
+                    </div> -->
+                    <div class="form-group row">
+                        <div class="col-md-3">
+                            <label>パスワード：</label>
+                        </div>
+                        <div class="col-md">
+                            <input
+                                type="password"
+                                class="form-control"
+                                name="room_password"
+                                placeholder="部屋パスワード"
+                                required
+                                />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-3">
+                            <label>パスワード確認：</label>
+                        </div>
+                        <div class="col-md">
+                            <input
+                                type="password"
+                                class="form-control"
+                                name="room_password2"
+                                placeholder="パスワード確認"
+                                required
+                                />
+                        </div>
+                    </div>
+                    <div>
+                        <input type="submit" class="btn btn-primary btn-block my-3" value="作成" />
+                    </div>
+                    <!-- <a href="/chats/login">ログイン画面はこちらから</a> -->
+            </form>
+        </div>
+    </body>
+</html>

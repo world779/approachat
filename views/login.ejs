@@ -2,46 +2,72 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+    />
     <title>ログイン画面</title>
   </head>
-  <body>
-    <h1>ログイン画面</h1>
+  <body class="px-md-5 pt-5">
+    <div class="px-sm-5 container">
+      <h1 class="text-center my-3">ログイン</h1>
 
-    <ul>
-      <% if(messages.success_msg) { %>
-      <li><%= messages.success_msg %></li>
-      <% } %>
-    </ul>
+      <ul>
+        <% if(messages.success_msg) { %>
+        <li><%= messages.success_msg %></li>
+        <% } %>
+      </ul>
 
-    <ul>
-      <% if (messages.error) { %>
-      <li><%= messages.error %></li>
-      <% } %>
-    </ul>
+      <ul>
+        <% if (messages.error) { %>
+        <li><%= messages.error %></li>
+        <% } %>
+      </ul>
 
-    <form action="/users/login" method="POST">
-      <div>
-        <label for="name1">メールアドレス：</label>
-        <input
-          type="email"
-          name="email"
-          placeholder="メールアドレス"
-          required
-        />
-      </div>
-      <div>
-        <label>パスワード：</label>
-        <input
-          type="password"
-          name="password"
-          placeholder="パスワード"
-          required
-        />
-      </div>
-      <div>
-        <input type="submit" value="Login" />
-      </div>
-      <a href="/users/register">登録画面はこちらから</a>
-    </form>
+      <form action="/users/login" method="POST">
+        <div class="form-group row">
+          <div class="col-md-3">
+            <label for="email">メールアドレス</label>
+          </div>
+          <div class="col-md">
+            <input
+              class="form-control"
+              type="email"
+              name="email"
+              placeholder="メールアドレス"
+              required
+            />
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-md-3">
+            <label for="password">パスワード</label>
+          </div>
+          <div class="col-md">
+            <input
+              class="form-control"
+              type="password"
+              name="password"
+              placeholder="パスワード"
+              required
+            />
+          </div>
+        </div>
+        <div>
+          <input
+            type="submit"
+            class="btn btn-primary btn-block mb-3"
+            value="ログイン"
+          />
+        </div>
+        <div class="text-center">
+          <a href="/users/register">登録画面はこちらから</a>
+        </div>
+      </form>
+    </div>
   </body>
 </html>
