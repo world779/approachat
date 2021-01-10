@@ -252,7 +252,7 @@ io.on("connection", function (socket) {
     }else{
       const token = crypto.createHash("sha1").update(SECRET_TOKEN + socket.id).digest('hex');
       // ユーザーリストに追加
-      MEMBER[socket.id] = { room:null, count:MEMBER_COUNT, x: 0, y: 0, color:null, dist: 0};
+      MEMBER[socket.id] = { room:null, count:MEMBER_COUNT, x: 0, y: 0, color:null, dist: MIN_DIST};
       TOKENS[socket.id] = token;
       MEMBER_COUNT++;
 
