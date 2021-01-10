@@ -52,8 +52,23 @@ app.get("/", (req, res) => {
 });
 
 app.get("/chat/*", (req, res) => {
-  res.sendFile(DOCUMENT_ROOT + "/chat.html");
-});
+  const room_name = req.url.slice(6);
+  pool.query(
+    `SELECT * FROM chats
+        WHERE name = $1`,
+    [room_name],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+
+      if (results.rows.length > 0) {
+        res.sendFile(DOCUMENT_ROOT + "/chat.html");
+      }else{
+        res.send("そのような部屋はありません");
+      }
+    });
+}
 
 app.get("/new",  (req, res) => {
   res.render("new");
