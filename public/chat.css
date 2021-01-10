@@ -1,8 +1,7 @@
-html, body { height: 100%; }
-
 body{
-    width: 100vw;
     background-color: #fafaf9;
+    width: 100000px;
+    height: 100000px;
 }
 
 .g-recaptcha{
@@ -39,8 +38,10 @@ body{
     position: absolute;
     top: 0px;
     left: 0px;
-    min-width: 100vw;
-    min-height: 100vh;
+    width: 100000px;
+    height: 100000px;
+    border: 1px solid #CED5DA;
+    border-radius: 4px;
     z-index: 0;
 }
 

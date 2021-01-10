@@ -90,7 +90,7 @@ app.post("/new", async (req, res) => {
 
     pool.query(
       `SELECT * FROM chats
-        WHERE room_name = $1`,
+        WHERE name = $1`,
       [room_name],
       (err, results) => {
         if (err) {
@@ -103,9 +103,9 @@ app.post("/new", async (req, res) => {
           res.render("new", { errors });
         } else {
           pool.query(
-            `INSERT INTO users (room_name, room_password)
+            `INSERT INTO chats (name, password)
             VALUES ($1, $2)
-            RETURNING id, room_password`,
+            RETURNING name`,
             [room_name, room_hashedPassword],
             (err, results) => {
               if (err) {
@@ -269,11 +269,11 @@ io.on("connection", function (socket) {
       MEMBER[socket.id].room = data.room;
       MEMBER[socket.id].color = data.color;
       socket.join(data.room);
-      var x = Math.floor(Math.random() * 50) * 10 + 250;
-      var y = Math.floor(Math.random() * 50) * 10 + 50;
+      var x = Math.floor(Math.random() * 50) * 10 + 350;
+      var y = Math.floor(Math.random() * 50) * 10 + 100;
       MEMBER[socket.id].x = x;
       MEMBER[socket.id].y = y;
-      io.to(MEMBER[socket.id].room).emit("s2c_join", { id: MEMBER[socket.id].count, color: data.color, x:x, y:y, dist: MIN_DIST + MAX_DIST / 200});
+      io.to(MEMBER[socket.id].room).emit("s2c_join", { id: MEMBER[socket.id].count, color: data.color, x:x, y:y, dist: MIN_DIST + MAX_DIST / 2});
     }
   });
 
