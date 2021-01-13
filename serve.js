@@ -61,7 +61,7 @@ app.get("/chat/*", (req, res) => {
   const room_name = req.url.slice(6);
   pool.query(
     `SELECT * FROM chats
-        WHERE name = $1`,
+        WHERE room_name = $1`,
     [room_name],
     (err, results) => {
       if (err) {
@@ -117,7 +117,7 @@ app.post("/new", checkNotAutheticated, async (req, res) => {
         if (err) {
           console.log(err);
         }
-        // console.log(results.rows);
+        console.log(results.rows);
 
         if (results.rows.length > 0) {
           errors.push({ message: "この部屋名は既に登録されています" });
@@ -300,7 +300,7 @@ io.on("connection", function (socket) {
   socket.on("c2s_join", function (data) {
     if (data.token == TOKENS[socket.id]) {
     pool.query(
-      `SELECT * FROM chats WHERE name = $1`,
+      `SELECT * FROM chats WHERE room_name = $1`,
       [data.room],
       (err, results) => {
         if (err) {
