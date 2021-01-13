@@ -12,6 +12,7 @@
             rel="stylesheet"
             href="../chat.css"
             />
+        <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
         <script src="https://www.google.com/recaptcha/api.js"></script>
         <script>
             function validateRecaptcha(code) {
@@ -55,8 +56,99 @@
                 <button type="button" class="btn btn-secondary" id="zoomOut">縮小</button>
                 <button type="button" class="btn btn-danger" id="disconnect" disabled>退出</button>
             </div>
+            <div class="content">
+            <a class="js-modal-open" href="">使い方を表示</a>
+        </div>
+        <div class="modal js-modal">
+            <div class="modal__bg js-modal-close"></div>
+            <div class="modal__content">
+                <section class="carousel" aria-label="Gallery">
+                <ol class="carousel__viewport">
+                <li id="carousel__slide1"
+                    tabindex="0"
+                    class="carousel__slide">
+                    <p class="slide1__content">移動したい場所にカーソルを合わせてダブルクリックすると、そこにアバターが移動します。</p>
+                    <!-- 動画か画像を入れる -->
+                  <div class="carousel__snapper">
+                    <a href="#carousel__slide4"
+                       class="carousel__prev"></a>
+                    <a href="#carousel__slide2"
+                       class="carousel__next"></a>
+                  </div>
+                </li>
+                <li id="carousel__slide2"
+                    tabindex="0"
+                    class="carousel__slide">
+                    <p class="slide1__content">発言の範囲を変更できます。</p>
+                    <!-- 動画か画像を入れる -->
+                  <div class="carousel__snapper"></div>
+                  <a href="#carousel__slide1"
+                     class="carousel__prev"></a>
+                  <a href="#carousel__slide3"
+                     class="carousel__next"></a>
+                </li>
+                <li id="carousel__slide3"
+                    tabindex="0"
+                    class="carousel__slide">
+                    <p class="slide1__content">拡大・縮小ができます。</p>
+                    <!-- 動画か画像を入れる -->
+                  <div class="carousel__snapper"></div>
+                  <a href="#carousel__slide2"
+                     class="carousel__prev"></a>
+                  <a href="#carousel__slide4"
+                     class="carousel__next"></a>
+                </li>
+                <li id="carousel__slide4"
+                    tabindex="0"
+                    class="carousel__slide">
+                    <p class="slide1__content">*****************</p>
+                    <!-- 動画か画像を入れる -->
+                  <div class="carousel__snapper"></div>
+                  <a href="#carousel__slide3"
+                     class="carousel__prev"></a>
+                  <a href="#carousel__slide1"
+                     class="carousel__next"></a>
+                </li>
+                </ol>
+                <aside class="carousel__navigation">
+                <ol class="carousel__navigation-list">
+                  <li class="carousel__navigation-item">
+                    <a href="#carousel__slide1"
+                       class="carousel__navigation-button"></a>
+                  </li>
+                  <li class="carousel__navigation-item">
+                    <a href="#carousel__slide2"
+                       class="carousel__navigation-button"></a>
+                  </li>
+                  <li class="carousel__navigation-item">
+                    <a href="#carousel__slide3"
+                       class="carousel__navigation-button"></a>
+                  </li>
+                  <li class="carousel__navigation-item">
+                    <a href="#carousel__slide4"
+                       class="carousel__navigation-button"></a>
+                  </li>
+                </ol>
+                </aside>
+                </section>
+
+                <a class="js-modal-close" href="">閉じる</a>
+            </div>
+        </div>
         </div>
         <div id="field"></div>
+        <script>
+                    $(function(){
+            $('.js-modal-open').on('click',function(){
+                $('.js-modal').fadeIn();
+                return false;
+            });
+            $('.js-modal-close').on('click',function(){
+                $('.js-modal').fadeOut();
+                return false;
+            });
+        });
+        </script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
