@@ -57,7 +57,11 @@
               <!-- This week -->
               ルーム管理
             </button>
-          </div>
+            </div><br>
+            <h2>こんにちは、<%= user %>さん</h2><br>
+            <% for ( let i = 0; i < room_lists.length; i++) { %>
+              <a href="../chat/<%= room_lists[i].room_name %>"><%= room_lists[i].room_name %></a><br>
+            <% } %>
         </main>
       </div>
     </div>
