@@ -235,7 +235,7 @@ ol, li {
   .carousel__snapper {
     animation-name: tonext, snap;
     animation-timing-function: ease;
-    animation-duration: 4s;
+    animation-duration: 100s;
     animation-iteration-count: infinite;
   }
  
@@ -329,7 +329,7 @@ ol, li {
 }
 .slide1__content {
   position: absolute;
-  top: 0;
+  top: 30rem;
   right: 0;
   bottom: 0;
   left: 0;
