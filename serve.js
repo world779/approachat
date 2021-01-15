@@ -128,7 +128,7 @@ app.post("/new", checkNotAutheticated, async (req, res) => {
           pool.query(
             `INSERT INTO chats (room_name, room_password, user_id)
             VALUES ($1, $2, ${req.user.id})
-            RETURNING id, room_password`,
+            RETURNING room_name, room_password`,
             [room_name, room_hashedPassword],
             (err, results) => {
               if (err) {
@@ -156,16 +156,7 @@ app.get("/users/login", checkAuthenticated, (req, res) => {
 });
 
 app.get("/users/dashboard", checkNotAutheticated, (req, res) => {
-  pool.query(`SELECT * FROM chats WHERE user_id = $1`, [req.user.id], (err, results) => {
-      if (err) {
-        throw err;
-      }
-      room_lists = results.rows;
-      console.log(room_lists);
-    });
-
-  res.render("dashboard", { user: req.user.name, room_lists: room_lists });
-  room_lists = null;
+  set_room_lists(req, res, room_lists, load_dashboard);
 });
 
 app.get("/users/index", checkNotAutheticated, (req, res) => {
@@ -266,6 +257,22 @@ function checkNotAutheticated(req, res, next) {
     return next();
   }
   res.redirect("/users/login");
+}
+
+function set_room_lists(req, res, room_lists, load_dashboard){
+  pool.query(`SELECT * FROM chats WHERE user_id = $1`, [req.user.id], (err, results) => {
+      if (err) {
+        throw err;
+      }
+      room_lists = results.rows;
+      console.log(room_lists);
+      load_dashboard(req, res, room_lists);
+    });
+}
+
+function load_dashboard(req, res, room_lists){
+  res.render("dashboard", { user: req.user.name, room_lists: room_lists });
+  room_lists = null;
 }
 
 app.use(express.static(__dirname + "/public"));
