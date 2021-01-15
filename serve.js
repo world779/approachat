@@ -124,9 +124,9 @@ app.post("/new", checkNotAutheticated, async (req, res) => {
           res.render("new", { errors });
         } else {
           pool.query(
-            `INSERT INTO users (room_name, room_password)
+            `INSERT INTO chats (room_name, room_password)
             VALUES ($1, $2)
-            RETURNING id, room_password`,
+            RETURNING room_name room_password`,
             [room_name, room_hashedPassword],
             (err, results) => {
               if (err) {
