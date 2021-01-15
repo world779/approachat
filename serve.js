@@ -311,7 +311,7 @@ io.on("connection", function (socket) {
         if (results.rows.length > 0) {
           const room = results.rows[0];
 
-          bcrypt.compare(data.password, room.password, (err, isMatch) => {
+          bcrypt.compare(data.password, room.room_password, (err, isMatch) => {
             if (err) {
               console.log(err);
             }
