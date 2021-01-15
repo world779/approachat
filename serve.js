@@ -129,6 +129,7 @@ app.post("/new", checkNotAutheticated, async (req, res) => {
             `INSERT INTO chats (room_name, room_password, user_id)
             VALUES ($1, $2, ${req.user.id})
             RETURNING room_name, room_password`,
+
             [room_name, room_hashedPassword],
             (err, results) => {
               if (err) {
