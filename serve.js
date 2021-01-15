@@ -156,7 +156,9 @@ app.get("/users/login", checkAuthenticated, (req, res) => {
 });
 
 app.get("/users/dashboard", checkNotAutheticated, (req, res) => {
-  set_room_lists(req, res, room_lists, load_dashboard);
+  set_room_lists(req, res, room_lists, (req, res, room_lists) => {
+    res.render("dashboard", { user: req.user.name, room_lists: room_lists });
+  });
 });
 
 app.get("/users/index", checkNotAutheticated, (req, res) => {
@@ -268,11 +270,6 @@ function set_room_lists(req, res, room_lists, load_dashboard){
       console.log(room_lists);
       load_dashboard(req, res, room_lists);
     });
-}
-
-function load_dashboard(req, res, room_lists){
-  res.render("dashboard", { user: req.user.name, room_lists: room_lists });
-  room_lists = null;
 }
 
 app.use(express.static(__dirname + "/public"));
