@@ -31,6 +31,11 @@ const MIN_DIST = 50;
 const MAX_DIST = 500;
 const MAX_MSG_LENGTH = 2000;
 
+const DB_ROOM_TABLE = "chats"
+const DB_ROOM_NAME_COLUMN = "room_name";
+const DB_USER_TABLE = "users";
+const DB_USER_EMAIL_COLUMN = "email";
+
 const MEMBER = {};
 const TOKENS = {};
 let MEMBER_COUNT = 1;
@@ -57,23 +62,10 @@ app.get("/", (req, res) => {
   res.sendFile(DOCUMENT_ROOT + "/index.html");
 });
 
-app.get("/chat/*", (req, res) => {
-  const room_name = req.url.slice(6);
-  pool.query(
-    `SELECT * FROM chats
-        WHERE room_name = $1`,
-    [room_name],
-    (err, results) => {
-      if (err) {
-        console.log(err);
-      }
-
-      if (results.rows.length > 0) {
-        res.sendFile(DOCUMENT_ROOT + "/chat.html");
-      }else{
-        res.send("そのような部屋はありません");
-      }
-    });
+app.get("/chat/*", async (req, res)=>{
+  const roomName = req.url.slice(6);
+  if (await checkExistence(DB_ROOM_TABLE, DB_ROOM_NAME_COLUMN, roomName))res.sendFile(DOCUMENT_ROOT + "/chat.html");
+  else res.send(`"${roomName}"という名前の部屋は登録されていません`);
 });
 
 app.get("/new", checkNotAutheticated, (req, res) => {
@@ -109,37 +101,25 @@ app.post("/new", checkNotAutheticated, async (req, res) => {
     let room_hashedPassword = await bcrypt.hash(room_password, 10);
     console.log(room_hashedPassword);
 
-    pool.query(
-      `SELECT * FROM chats
-        WHERE room_name = $1`,
-      [room_name],
-      (err, results) => {
-        if (err) {
-          console.log(err);
-        }
-        console.log(results.rows);
-
-        if (results.rows.length > 0) {
-          errors.push({ message: "この部屋名は既に登録されています" });
-          res.render("new", { errors });
-        } else {
-          pool.query(
-            `INSERT INTO chats (room_name, room_password)
+    if (await checkExistence(DB_ROOM_TABLE, DB_ROOM_NAME_COLUMN, room_name)) {
+      errors.push({ message: "この部屋名は既に登録されています" });
+      res.render("new", { errors });
+    } else {
+      pool.query(
+        `INSERT INTO chats (room_name, room_password)
             VALUES ($1, $2)
             RETURNING room_name room_password`,
-            [room_name, room_hashedPassword],
-            (err, results) => {
-              if (err) {
-                throw err;
-              }
-              console.log(results.rows);
-              req.flash("success_msg", "部屋が作成されました。");
-              res.redirect("/chat/" + room_name);
-            }
-          );
+        [room_name, room_hashedPassword],
+        (err, results) => {
+          if (err) {
+            throw err;
+          }
+          console.log(results.rows);
+          req.flash("success_msg", "部屋が作成されました。");
+          res.redirect("/chat/" + room_name);
         }
-      }
-    );
+      );
+    }
   }
 });
 
@@ -192,43 +172,30 @@ app.post("/users/register", async (req, res) => {
   if (errors.length > 0) {
     res.render("register", { errors });
   } else {
-    let hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
     console.log(hashedPassword);
-
-    pool.query(
-      `SELECT * FROM users
-        WHERE email = $1`,
-      [email],
-      (err, results) => {
-        if (err) {
-          console.log(err);
-        }
-        console.log(results.rows);
-
-        if (results.rows.length > 0) {
-          errors.push({ message: "このメールアドレスは既に登録されています" });
-          res.render("register", { errors });
-        } else {
-          pool.query(
-            `INSERT INTO users (name, email, password)
+    if (await checkExistence(DB_USER_TABLE, DB_USER_EMAIL_COLUMN, email)) {
+      errors.push({ message: "このメールアドレスは既に登録されています" });
+      res.render("register", { errors });
+    } else {
+      pool.query(
+        `INSERT INTO users (name, email, password)
             VALUES ($1, $2, $3)
             RETURNING id, password`,
-            [name, email, hashedPassword],
-            (err, results) => {
-              if (err) {
-                throw err;
-              }
-              console.log(results.rows);
-              req.flash(
-                "success_msg",
-                "登録が完了しました。ログインしてください。"
-              );
-              res.redirect("/users/login");
-            }
+        [name, email, hashedPassword],
+        (err, results) => {
+          if (err) {
+            throw err;
+          }
+          console.log(results.rows);
+          req.flash(
+            "success_msg",
+            "登録が完了しました。ログインしてください。"
           );
+          res.redirect("/users/login");
         }
-      }
-    );
+      );
+    }
   }
 });
 
@@ -306,7 +273,6 @@ io.on("connection", function (socket) {
         if (err) {
           throw err;
         }
-        console.log(results.rows);
 
         if (results.rows.length > 0) {
           const room = results.rows[0];
@@ -399,6 +365,14 @@ io.on("connection", function (socket) {
     }
   });
 });
+
+async function checkExistence(table, column, val){
+  return pool
+    .query(`SELECT * FROM ${table} WHERE ${column} = $1`, [val])
+    .then(res=>res.rows.length > 0)
+    .catch(err=>console.log(err))
+}
+
 
 function calcDist(x1, y1, x2, y2) {
   return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
