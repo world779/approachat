@@ -1,4 +1,3 @@
-var MEMBER = "";
 const IAM = {
   id: "",
   room: "",
@@ -43,8 +42,10 @@ socket.on("token", function(data){
   }
 });
 
-  socket.on("initial_data", function (data) {
-    Object.keys(data.data).forEach(function (key) {
+socket.on("initial_data", function (data) {
+  toggleForm();
+  IAM.isEnter = true;
+  Object.keys(data.data).forEach(function (key) {
     var member = this[key];
     if(member.room == IAM.room){
       appendAvatar(member.count, member.color);
@@ -81,11 +82,16 @@ socket.on('disconnect', function () {
   }
 });
 
+socket.on('auth_err',function(err){
+  $("#passForm").addClass("is-invalid");
+  $("#pass-err").text(err.text);
+});
+
 window.onload = function(){
   console.log("loaded");
   var url = location.pathname;
   var roomName = url.replace("/chat/", "");
-  document.getElementById("roomForm").value = roomName;
+  $("#passLabel").text(`"${roomName}"のパスワード`);
 
   $("form").submit(function (e) {
     if (IAM.isEnter) {
@@ -96,12 +102,9 @@ window.onload = function(){
       $("#msgForm").val("");
     } else {
       if(!socket.connected) socket.connect();
-      var room = $("#roomForm").val();
       var pass = $("#passForm").val();
-      IAM.room = room;
-      socket.emit("c2s_join", {token: IAM.token, room:room, color: genRandColor(), password: pass });
-      toggleForm();
-      IAM.isEnter = true;
+      IAM.room = roomName;
+      socket.emit("c2s_join", {token: IAM.token, room:roomName, color: genRandColor(), password: pass });
     }
     e.preventDefault();
   });
