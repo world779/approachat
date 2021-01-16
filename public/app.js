@@ -83,6 +83,8 @@ socket.on('disconnect', function () {
 });
 
 socket.on('auth_err',function(err){
+  $("#passForm").addClass("is-invalid");
+  $("#pass-err").text(err.text);
 });
 
 window.onload = function(){

@@ -332,8 +332,12 @@ io.on("connection", function (socket) {
                 dist: MIN_DIST + MAX_DIST / 200,
               });
 
+            }else{
+              io.to(socket.id).emit("auth_err", { text: "パスワードが正しくありません" });
             }
           });
+        }else{
+          io.to(socket.id).emit("auth_err", { text: `"${data.room}"という部屋はありません` });
         }
       }
     );
