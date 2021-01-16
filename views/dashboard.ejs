@@ -3,6 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <title>ダッシュボード</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <link
       rel="stylesheet"
       href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
@@ -33,8 +36,7 @@
       <div class="row">
         <main role="main" class="col-md-9 col-lg-10 px-4">
           <div
-            class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
-          >
+            class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <!-- <h1 class="h2">Dashboard</h1> -->
             <h1 class="h2">ダッシュボード</h1>
           </div>
@@ -49,24 +51,27 @@
                 <a href="/new">新規作成</a>
               </button>
             </div>
-            <button
-              type="button"
-              class="btn btn-sm btn-outline-secondary dropdown-toggle"
-            >
-              <span data-feather="calendar"></span>
-              <!-- This week -->
-              ルーム管理
-            </button>
-          </div>
+            <div class="dropdown">
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false">
+                ルーム管理
+              </button>
+                <!-- <span data-feather="calendar"></span> -->
+                <!-- This week -->
+                <div class="dropdown-menu" aria-labelledby="ルーム管理">
+                  <% for ( let i = 0; i < room_lists.length; i++) { %>
+                    <a href="../chat/<%= room_lists[i].room_name %>" class="dropdown-item"><%= room_lists[i].room_name %></a>
+                  <% } %>
+                </div>
+            </div>
+          </div><br>
+          <h2>こんにちは、<%= user %>さん</h2>
         </main>
       </div>
     </div>
-
-    <!-- <h1>ダッシュボード</h1>
-      <h2>こんにちは、<%= user %>さん</h2>
-      <div class="option-list">
-        <a href="/users/index">入室</a>
-        <a href="/new">部屋の新規作成</a>
-      </div> -->
   </body>
 </html>
