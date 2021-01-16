@@ -267,7 +267,7 @@ io.on("connection", function (socket) {
         x: 0,
         y: 0,
         color: null,
-        dist: 0,
+        dist: MIN_DIST + MAX_DIST / 2,
       };
       TOKENS[socket.id] = token;
       MEMBER_COUNT++;
@@ -312,7 +312,7 @@ io.on("connection", function (socket) {
                 color: data.color,
                 x: x,
                 y: y,
-                dist: MIN_DIST + MAX_DIST / 200,
+                dist: MIN_DIST + MAX_DIST / 2,
               });
 
             }else{
@@ -377,6 +377,7 @@ io.on("connection", function (socket) {
         color: MEMBER[socket.id].color,
       });
       delete MEMBER[socket.id];
+      delete TOKENS[socket.id];
     } catch {
       console.log("未入室のユーザが退出しました");
     }
