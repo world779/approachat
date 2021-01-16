@@ -4,7 +4,8 @@ body {
 }
 
 body {
-  width: 100vw;
+  width: 100000px;
+  height: 100000px;
   background-color: #fafaf9;
 }
 
@@ -42,8 +43,8 @@ body {
   position: absolute;
   top: 0px;
   left: 0px;
-  min-width: 100vw;
-  min-height: 100vh;
+  width: 100000px;
+  height: 100000px;
   z-index: 0;
 }
 
