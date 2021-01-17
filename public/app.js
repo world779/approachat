@@ -130,6 +130,8 @@ window.onload = function(){
     IAM.isEnter = false;
   });
 
+  $("#resetView").click(adjustViewPoint);
+
   $("#zoomIn").click(function(){
     const field = document.getElementById("field");
     anime({
