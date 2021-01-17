@@ -60,6 +60,7 @@ socket.on("s2c_join", function(data){
   appendAvatar(data.id, data.color);
   drawCurrentDist(data.id, data.dist);
   $(`#${data.id}`).css("transform",`translateX(${data.x}px) translateY(${data.y}px)`);
+  if(data.id == IAM.id) adjustViewPoint();
 });
 
 socket.on("s2c_move", function (data) {
@@ -217,6 +218,13 @@ function moveAvatar(id, x, y) {
       if(id = IAM.id) IAM.isMoving = false;
     }
   });
+}
+
+function adjustViewPoint(){
+  $("html,body").animate({
+      scrollTop: $(`#${IAM.id}`).offset().top - window.innerHeight/2,
+      scrollLeft: $(`#${IAM.id}`).offset().left - window.innerWidth/2
+    });
 }
 
 function genRandColor(){
