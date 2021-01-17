@@ -121,14 +121,14 @@ window.onload = function(){
   $("#dist").change(onDistChange);
   document.getElementById("msgForm").addEventListener("input", validateMsgLength);
 
-  $("#disconnect").click(function(){
-    socket.emit("c2s_leave", { token: IAM.token });
-    toggleForm();
-    removeAvatar();
-    $("#chatLogs").empty();
-    IAM.isConnected = false;
-    IAM.isEnter = false;
-  });
+  // $("#disconnect").click(function(){
+  //   socket.emit("c2s_leave", { token: IAM.token });
+  //   toggleForm();
+  //   removeAvatar();
+  //   $("#chatLogs").empty();
+  //   IAM.isConnected = false;
+  //   IAM.isEnter = false;
+  // });
 
   $("#resetView").click(adjustViewPoint);
 
@@ -188,11 +188,11 @@ function toggleForm(){
   if(IAM.isEnter){
     $("#chatForm").css("display", "none");
     $("#enterForm").css("display", "inline");
-    $("#disconnect").prop('disabled', true);
+    // $("#disconnect").prop('disabled', true);
   }else{
     $("#chatForm").css("display", "inline");
     $("#enterForm").css("display", "none");
-    $("#disconnect").prop('disabled', false);
+    // $("#disconnect").prop('disabled', false);
   }
 }
 
