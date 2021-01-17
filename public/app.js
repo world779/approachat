@@ -113,8 +113,6 @@ window.onload = function(){
   $("#field").click(function(e){
     if(IAM.isMoving) return;
     var offset = $(this).offset();
-    console.log(offset);
-    console.log(e.pageX, e.pageY);
     var x = e.pageX/curScale;
     var y = e.pageY/curScale;
     socket.emit("c2s_move", { token: IAM.token, x: x, y: y });
