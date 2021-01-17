@@ -25,13 +25,13 @@ const DOCUMENT_ROOT = __dirname + "/public";
 
 require("dotenv").config();
 
-const SECRET_TOKEN = process.env.SECRET_TOKEN;
+const { SECRET_TOKEN } = process.env;
 
 const MIN_DIST = 50;
 const MAX_DIST = 500;
 const MAX_MSG_LENGTH = 2000;
 
-const DB_ROOM_TABLE = "chats"
+const DB_ROOM_TABLE = "chats";
 const DB_ROOM_NAME_COLUMN = "room_name";
 const DB_USER_TABLE = "users";
 const DB_USER_EMAIL_COLUMN = "email";
@@ -65,7 +65,7 @@ app.get("/", (req, res) => {
 
 app.get("/chat/*", async (req, res)=>{
   const roomName = req.url.slice(6);
-  if (await checkExistence(DB_ROOM_TABLE, DB_ROOM_NAME_COLUMN, roomName))res.sendFile(DOCUMENT_ROOT + "/chat.html");
+  if (await checkExistence(DB_ROOM_TABLE, DB_ROOM_NAME_COLUMN, roomName)) res.sendFile(DOCUMENT_ROOT + "/chat.html");
   else res.send(`"${roomName}"という名前の部屋は登録されていません`);
 });
 
@@ -74,7 +74,7 @@ app.get("/new", checkNotAutheticated, (req, res) => {
 });
 
 app.post("/new", checkNotAutheticated, async (req, res) => {
-  let { room_name, room_password, room_password2 } = req.body;
+  const { room_name, room_password, room_password2 } = req.body;
 
   console.log({
     room_name,
@@ -82,7 +82,7 @@ app.post("/new", checkNotAutheticated, async (req, res) => {
     room_password2,
   });
 
-  let errors = [];
+  const errors = [];
 
   if (!room_name || !room_password || !room_password2) {
     errors.push({ message: "すべての項目を入力してください" });
@@ -99,7 +99,7 @@ app.post("/new", checkNotAutheticated, async (req, res) => {
   if (errors.length > 0) {
     res.render("new", { errors });
   } else {
-    let room_hashedPassword = await bcrypt.hash(room_password, 10);
+    const room_hashedPassword = await bcrypt.hash(room_password, 10);
     console.log(room_hashedPassword);
     console.log(req.user.id);
 
@@ -111,7 +111,9 @@ app.post("/new", checkNotAutheticated, async (req, res) => {
         `INSERT INTO chats (room_name, room_password)
             VALUES ($1, $2)
             RETURNING room_name room_password`,
-        [room_name, room_hashedPassword],
+        [
+room_name, room_hashedPassword
+],
         (err, results) => {
           if (err) {
             throw err;
@@ -124,8 +126,6 @@ app.post("/new", checkNotAutheticated, async (req, res) => {
     }
   }
 });
-
-
 
 app.get("/users/register", checkAuthenticated, (req, res) => {
   res.render("register");
@@ -152,7 +152,7 @@ app.get("/users/logout", (req, res) => {
 });
 
 app.post("/users/register", async (req, res) => {
-  let { name, email, password, password2 } = req.body;
+  const { name, email, password, password2 } = req.body;
 
   console.log({
     name,
@@ -161,7 +161,7 @@ app.post("/users/register", async (req, res) => {
     password2,
   });
 
-  let errors = [];
+  const errors = [];
 
   if (!name || !email || !password || !password2) {
     errors.push({ message: "すべての項目を入力してください" });
@@ -188,7 +188,9 @@ app.post("/users/register", async (req, res) => {
         `INSERT INTO users (name, email, password)
             VALUES ($1, $2, $3)
             RETURNING id, password`,
-        [name, email, hashedPassword],
+        [
+name, email, hashedPassword
+],
         (err, results) => {
           if (err) {
             throw err;
@@ -228,15 +230,19 @@ function checkNotAutheticated(req, res, next) {
   res.redirect("/users/login");
 }
 
-function set_room_lists(req, res, room_lists, load_dashboard){
-  pool.query(`SELECT * FROM chats WHERE user_id = $1`, [req.user.id], (err, results) => {
+function set_room_lists(req, res, room_lists, load_dashboard) {
+  pool.query(
+    `SELECT * FROM chats WHERE user_id = $1`,
+    [req.user.id],
+    (err, results) => {
       if (err) {
         throw err;
       }
       room_lists = results.rows;
       console.log(room_lists);
       load_dashboard(req, res, room_lists);
-    });
+    }
+  );
 }
 
 app.use(express.static(__dirname + "/public"));
@@ -283,52 +289,59 @@ io.on("connection", function (socket) {
   // ルームに入室されたらsocketをroomにjoinさせてメンバーリストにもそれを反映
   socket.on("c2s_join", function (data) {
     if (data.token == TOKENS[socket.id]) {
-    pool.query(
-      `SELECT * FROM chats WHERE room_name = $1`,
-      [data.room],
-      (err, results) => {
-        if (err) {
-          throw err;
+      pool.query(
+        `SELECT * FROM chats WHERE room_name = $1`,
+        [data.room],
+        (err, results) => {
+          if (err) {
+            throw err;
+          }
+
+          if (results.rows.length > 0) {
+            const room = results.rows[0];
+
+            bcrypt.compare(
+              data.password,
+              room.room_password,
+              (err, isMatch) => {
+                if (err) {
+                  console.log(err);
+                }
+                if (isMatch) {
+                  io.to(socket.id).emit("initial_data", { data: MEMBER });
+                  MEMBER[socket.id].room = data.room;
+                  MEMBER[socket.id].color = data.color;
+                  socket.join(data.room);
+                  var x = Math.floor(Math.random() * 50) * 10 + 250;
+                  var y = Math.floor(Math.random() * 50) * 10 + 50;
+                  MEMBER[socket.id].x = x;
+                  MEMBER[socket.id].y = y;
+                  io.to(MEMBER[socket.id].room).emit("s2c_join", {
+                    id: MEMBER[socket.id].count,
+                    color: data.color,
+                    x: x,
+                    y: y,
+                    dist: MIN_DIST + MAX_DIST / 2,
+                  });
+                } else {
+                  io.to(socket.id).emit("auth_err", {
+                    text: "パスワードが正しくありません"
+                  });
+                }
+              }
+            );
+          } else {
+            io.to(socket.id).emit("auth_err", {
+              text: `"${data.room}"という部屋はありません`
+            });
+          }
         }
-
-        if (results.rows.length > 0) {
-          const room = results.rows[0];
-
-          bcrypt.compare(data.password, room.room_password, (err, isMatch) => {
-            if (err) {
-              console.log(err);
-            }
-            if (isMatch) {
-              io.to(socket.id).emit("initial_data", { data: MEMBER });
-              MEMBER[socket.id].room = data.room;
-              MEMBER[socket.id].color = data.color;
-              socket.join(data.room);
-              var x = Math.floor(Math.random() * 50) * 10 + 250;
-              var y = Math.floor(Math.random() * 50) * 10 + 50;
-              MEMBER[socket.id].x = x;
-              MEMBER[socket.id].y = y;
-              io.to(MEMBER[socket.id].room).emit("s2c_join", {
-                id: MEMBER[socket.id].count,
-                color: data.color,
-                x: x,
-                y: y,
-                dist: MIN_DIST + MAX_DIST / 2,
-              });
-
-            }else{
-              io.to(socket.id).emit("auth_err", { text: "パスワードが正しくありません" });
-            }
-          });
-        }else{
-          io.to(socket.id).emit("auth_err", { text: `"${data.room}"という部屋はありません` });
-        }
-      }
-    );
+      );
     }
   });
 
   socket.on("c2s_msg", function (data) {
-    var msg = data.msg;
+    var { msg } = data;
     if (MEMBER[socket.id] == null) return;
     if (msg.length > MAX_MSG_LENGTH) return;
     if (TOKENS[socket.id] != data.token) return;
@@ -346,7 +359,7 @@ io.on("connection", function (socket) {
 
   socket.on("c2s_dist", function (data) {
     if (TOKENS[socket.id] != data.token) return;
-    var dist = data.dist;
+    var { dist } = data;
     if (dist > 100) dist = 100;
     dist = (dist * MAX_DIST) / 100 + MIN_DIST;
     MEMBER[socket.id].dist = dist;
@@ -384,13 +397,12 @@ io.on("connection", function (socket) {
   });
 });
 
-async function checkExistence(table, column, val){
+async function checkExistence(table, column, val) {
   return pool
     .query(`SELECT * FROM ${table} WHERE ${column} = $1`, [val])
-    .then(res=>res.rows.length > 0)
-    .catch(err=>console.log(err))
+    .then((res) => res.rows.length > 0)
+    .catch((err)=>console.log(err));
 }
-
 
 function calcDist(x1, y1, x2, y2) {
   return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
