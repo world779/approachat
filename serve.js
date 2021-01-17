@@ -312,8 +312,8 @@ io.on("connection", function (socket) {
                   MEMBER[socket.id].room = data.room;
                   MEMBER[socket.id].color = data.color;
                   socket.join(data.room);
-                  var x = Math.floor(Math.random() * 100) * 50 + 2000;
-                  var y = Math.floor(Math.random() * 100) * 50 + 2000;
+                  var x = Math.floor(Math.random() * 100) * 5 + 2000;
+                  var y = Math.floor(Math.random() * 100) * 5 + 2000;
                   MEMBER[socket.id].x = x;
                   MEMBER[socket.id].y = y;
                   io.to(MEMBER[socket.id].room).emit("s2c_join", {
