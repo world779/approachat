@@ -59,6 +59,10 @@ app.get("/", (req, res) => {
 
 app.get("/chat/*", (req, res) => {
   const room_name = req.url.slice(6);
+  // for (i = 0; i < MEMBER_COUNT; i++) {
+  //   console.log(MEMBER[i]);
+  // }
+
   pool.query(
     `SELECT * FROM chats
         WHERE room_name = $1`,
@@ -70,10 +74,11 @@ app.get("/chat/*", (req, res) => {
 
       if (results.rows.length > 0) {
         res.sendFile(DOCUMENT_ROOT + "/chat.html");
-      }else{
+      } else {
         res.send("そのような部屋はありません");
       }
-    });
+    }
+  );
 });
 
 app.get("/new", checkNotAutheticated, (req, res) => {
@@ -278,6 +283,7 @@ io.on("connection", function (socket) {
         .digest("hex");
       // ユーザーリストに追加
       MEMBER[socket.id] = {
+        name: null,
         room: null,
         count: MEMBER_COUNT,
         x: 0,
@@ -299,44 +305,48 @@ io.on("connection", function (socket) {
   // ルームに入室されたらsocketをroomにjoinさせてメンバーリストにもそれを反映
   socket.on("c2s_join", function (data) {
     if (data.token == TOKENS[socket.id]) {
-    pool.query(
-      `SELECT * FROM chats WHERE room_name = $1`,
-      [data.room],
-      (err, results) => {
-        if (err) {
-          throw err;
+      pool.query(
+        `SELECT * FROM chats WHERE room_name = $1`,
+        [data.room],
+        // name
+        `SELECT * FROM users WHERE name = $1`,
+        [data.name],
+        //
+        (err, results) => {
+          if (err) {
+            throw err;
+          }
+          console.log(results.rows);
+
+          if (results.rows.length > 0) {
+            const room = results.rows[0];
+
+            bcrypt.compare(data.password, room.password, (err, isMatch) => {
+              if (err) {
+                console.log(err);
+              }
+              if (isMatch) {
+                io.to(socket.id).emit("initial_data", { data: MEMBER });
+                MEMBER[socket.id].room = data.room;
+                MEMBER[socket.id].color = data.color;
+                MEMBER[socket.id].name = data.name;
+                socket.join(data.room);
+                var x = Math.floor(Math.random() * 50) * 10 + 250;
+                var y = Math.floor(Math.random() * 50) * 10 + 50;
+                MEMBER[socket.id].x = x;
+                MEMBER[socket.id].y = y;
+                io.to(MEMBER[socket.id].room).emit("s2c_join", {
+                  id: MEMBER[socket.id].count,
+                  color: data.color,
+                  x: x,
+                  y: y,
+                  dist: MIN_DIST + MAX_DIST / 200,
+                });
+              }
+            });
+          }
         }
-        console.log(results.rows);
-
-        if (results.rows.length > 0) {
-          const room = results.rows[0];
-
-          bcrypt.compare(data.password, room.password, (err, isMatch) => {
-            if (err) {
-              console.log(err);
-            }
-            if (isMatch) {
-              io.to(socket.id).emit("initial_data", { data: MEMBER });
-              MEMBER[socket.id].room = data.room;
-              MEMBER[socket.id].color = data.color;
-              socket.join(data.room);
-              var x = Math.floor(Math.random() * 50) * 10 + 250;
-              var y = Math.floor(Math.random() * 50) * 10 + 50;
-              MEMBER[socket.id].x = x;
-              MEMBER[socket.id].y = y;
-              io.to(MEMBER[socket.id].room).emit("s2c_join", {
-                id: MEMBER[socket.id].count,
-                color: data.color,
-                x: x,
-                y: y,
-                dist: MIN_DIST + MAX_DIST / 200,
-              });
-
-            }
-          });
-        }
-      }
-    );
+      );
     }
   });
 
@@ -388,6 +398,7 @@ io.on("connection", function (socket) {
         id: MEMBER[socket.id].count,
         msg: msg,
         color: MEMBER[socket.id].color,
+        name: MEMBER[socket.id].name,
       });
       delete MEMBER[socket.id];
     } catch {
