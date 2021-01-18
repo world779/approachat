@@ -308,10 +308,6 @@ io.on("connection", function (socket) {
       pool.query(
         `SELECT * FROM chats WHERE room_name = $1`,
         [data.room],
-        // name
-        `SELECT * FROM users WHERE name = $1`,
-        [data.name],
-        //
         (err, results) => {
           if (err) {
             throw err;
@@ -321,7 +317,7 @@ io.on("connection", function (socket) {
           if (results.rows.length > 0) {
             const room = results.rows[0];
 
-            bcrypt.compare(data.password, room.password, (err, isMatch) => {
+            bcrypt.compare(data.password, room.room_password, (err, isMatch) => {
               if (err) {
                 console.log(err);
               }
