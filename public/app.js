@@ -1,5 +1,4 @@
 var MEMBER = "";
-var nameList = [];
 const IAM = {
   id: "",
   room: "",
@@ -27,7 +26,7 @@ socket.on("s2c_msg", function (data) {
 
 socket.on("s2c_leave", function (data) {
   appendMsg(data.msg, data.color);
-  $(`#${data.id}`).remove();
+  removeList(data.id);
 });
 
 socket.on("connect", function (data) {
@@ -47,7 +46,7 @@ socket.on("initial_data", function (data) {
   Object.keys(data.data).forEach(function (key) {
     var member = this[key];
     if (member.room == IAM.room) {
-      appendAvatar(member.count, member.color);
+      appendAvatar(member.count, member.color, member.input_name);
       $(`#${member.count}`).css(
         "transform",
         `translateX(${member.x}px) translateY(${member.y}px)`
@@ -58,12 +57,10 @@ socket.on("initial_data", function (data) {
 });
 
 socket.on("s2c_join", function (data) {
-  // var input_name = document.getElementById("nameForm").value;
-  // nameList.push(input_name);
   appendMsg("入室しました", data.color);
-  // appendAvatar(data.id, data.color);
+  appendAvatar(data.id, data.color, data.input_name);
   drawCurrentDist(data.id, data.dist);
-  $(`#${data.id}`).css(
+  $(`.${data.id}`).css(
     "transform",
     `translateX(${data.x}px) translateY(${data.y}px)`
   );
@@ -108,12 +105,12 @@ window.onload = function () {
       var input_name = $("#nameForm").val();
       var room = $("#roomForm").val();
       var pass = $("#passForm").val();
-      nameList.push(input_name);
       IAM.room = room;
       socket.emit("c2s_join", {
         token: IAM.token,
         room: room,
         color: genRandColor(),
+        input_name: input_name,
         password: pass,
       });
       toggleForm();
@@ -139,12 +136,10 @@ window.onload = function () {
     socket.emit("c2s_leave", { token: IAM.token });
     toggleForm();
     removeAvatar();
-    removeList();
     $("#chatLogs").empty();
     IAM.isConnected = false;
     IAM.isEnter = false;
   });
-  f;
 
   $("#zoomIn").click(function () {
     const field = document.getElementById("field");
@@ -171,30 +166,21 @@ window.onbeforeunload = function () {
   socket.emit("c2s_leave", { token: IAM.token });
 };
 
-function appendAvatar(id, color) {
+function appendAvatar(id, color, input_name) {
   $("#field").append(
-    `<div id=${id} class="avatar">${id}<div id=${id}-effect class="avatar-effect"></div></div>`
+    `<div id=${id} class="avatar ${id}">${id}<div id=${id}-effect class="avatar-effect"></div></div>`
   );
   $(`#${id}`).css("background-color", color);
   $(`#${id}-effect`).css("border", "1px solid " + color);
-  for (let i = 0; i < nameList.length; i++) {
-    $("#name-list").append(`<li class="Name">${nameList[i]}</li>`);
-  }
+  $("#name-list").append(`<li id="${id}-name">${input_name}</li>`);
 }
 
 function removeAvatar() {
   $(".avatar").remove();
 }
 
-// function appendList(nameList) {
-  // for (let i = 0; i < nameList.length; i++) {
-  //   $("#name-list").append(`<li class="Name">${nameList[i]}</li>`);
-  // }
-//   // $("#name-list").append(`<div class="Name">ヒカル</div>`);
-// }
-
-// function removeList() {
-//   $(".Name").remove();
+function removeList(id) {
+  $(`#name-list > #${id}-name`).remove();
 }
 
 function appendMsg(text, color) {
