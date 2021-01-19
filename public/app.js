@@ -1,4 +1,5 @@
 var MEMBER = "";
+var nameList = [];
 const IAM = {
   id: "",
   room: "",
@@ -47,7 +48,6 @@ socket.on("initial_data", function (data) {
     var member = this[key];
     if (member.room == IAM.room) {
       appendAvatar(member.count, member.color);
-      appendList(member.name);
       $(`#${member.count}`).css(
         "transform",
         `translateX(${member.x}px) translateY(${member.y}px)`
@@ -58,8 +58,10 @@ socket.on("initial_data", function (data) {
 });
 
 socket.on("s2c_join", function (data) {
+  // var input_name = document.getElementById("nameForm").value;
+  // nameList.push(input_name);
   appendMsg("入室しました", data.color);
-  appendAvatar(data.id, data.color);
+  // appendAvatar(data.id, data.color);
   drawCurrentDist(data.id, data.dist);
   $(`#${data.id}`).css(
     "transform",
@@ -91,6 +93,7 @@ window.onload = function () {
   console.log("loaded");
   var url = location.pathname;
   var roomName = url.replace("/chat/", "");
+  roomName = roomName.replace(location.search, "");
   document.getElementById("roomForm").value = roomName;
 
   $("form").submit(function (e) {
@@ -102,8 +105,10 @@ window.onload = function () {
       $("#msgForm").val("");
     } else {
       if (!socket.connected) socket.connect();
+      var input_name = $("#nameForm").val();
       var room = $("#roomForm").val();
       var pass = $("#passForm").val();
+      nameList.push(input_name);
       IAM.room = room;
       socket.emit("c2s_join", {
         token: IAM.token,
@@ -139,6 +144,7 @@ window.onload = function () {
     IAM.isConnected = false;
     IAM.isEnter = false;
   });
+  f;
 
   $("#zoomIn").click(function () {
     const field = document.getElementById("field");
@@ -159,8 +165,6 @@ window.onload = function () {
     });
     curScale /= 1.2;
   });
-  // 作業
-  $("#user-list").html(MEMBER[0]);
 };
 
 window.onbeforeunload = function () {
@@ -173,19 +177,24 @@ function appendAvatar(id, color) {
   );
   $(`#${id}`).css("background-color", color);
   $(`#${id}-effect`).css("border", "1px solid " + color);
+  for (let i = 0; i < nameList.length; i++) {
+    $("#name-list").append(`<li class="Name">${nameList[i]}</li>`);
+  }
 }
 
 function removeAvatar() {
   $(".avatar").remove();
 }
 
-function appendList(id, color, name) {
-  $("#list").append(`<div id=${id} class="name-list">${name}</div>`);
-  $(`#${id}`).css("background-color", color);
-}
+// function appendList(nameList) {
+  // for (let i = 0; i < nameList.length; i++) {
+  //   $("#name-list").append(`<li class="Name">${nameList[i]}</li>`);
+  // }
+//   // $("#name-list").append(`<div class="Name">ヒカル</div>`);
+// }
 
-function removeList() {
-  $(".name-list").remove();
+// function removeList() {
+//   $(".Name").remove();
 }
 
 function appendMsg(text, color) {

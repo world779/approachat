@@ -28,6 +28,8 @@
       <div class="text-center">
         <form id="enterForm">
           <div class="form-row">
+            <label id="nameLabel" for="nameForm">表示名</label>
+            <input type="text" id="nameForm" class="form-control" />
             <label id="roomLabel" for="roomForm">部屋</label>
             <input type="text" id="roomForm" class="form-control" />
             <label class="mt-2" id="passLabel" for="passForm">パスワード</label>
@@ -94,7 +96,7 @@
       </div>
 
       {% comment %} 作業 {% endcomment %}
-      <div id="list"></div>
+      <ul id="name-list"></ul>
       {% comment %} 作業 {% endcomment %}
 
       <div class="modal js-modal">
