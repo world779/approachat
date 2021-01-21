@@ -26,7 +26,7 @@ router.get("/index", commonFuncs.checkNotAutheticated, (req, res) => {
 router.get("/logout", (req, res) => {
   req.logout();
   req.flash("success_msg", "ログアウトを完了しました");
-  res.redirect("/login");
+  res.redirect("/users/login");
 });
 
 router.post("/register", async (req, res) => {
@@ -82,7 +82,7 @@ router.post("/register", async (req, res) => {
             "success_msg",
             "登録が完了しました。ログインしてください。"
           );
-          res.redirect("/login");
+          res.redirect("/users/login");
         }
       );
     }
