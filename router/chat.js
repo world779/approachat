@@ -73,7 +73,7 @@ router.post("/new", commonFuncs.checkNotAutheticated, async (req, res) => {
           }
           console.log(results.rows);
           req.flash("success_msg", "部屋が作成されました。");
-          res.redirect("/chat/" + roomName);
+          res.redirect("/chat/room" + roomName);
         }
       );
     }
