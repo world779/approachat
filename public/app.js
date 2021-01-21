@@ -96,7 +96,7 @@ socket.on('auth_err',function(err){
 window.onload = function(){
   console.log("loaded");
   var url = location.pathname;
-  var roomName = url.replace("/chat/", "");
+  var roomName = url.replace("/chat/room/", "");
   $("#passLabel").text(`"${roomName}"のパスワード`);
 
   $("form").submit(function (e) {

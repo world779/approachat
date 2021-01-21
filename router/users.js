@@ -1,28 +1,35 @@
-app.get("/users/register", checkAuthenticated, (req, res) => {
+var router = require("express").Router();
+
+const { passport } = require("../serve.js")
+const { pool, DB_USER_TABLE, DB_USER_EMAIL_COLUMN } = require("../dbConfig");
+const bcrypt = require("bcrypt");
+const commonFuncs = require("../commonFuncs.js");
+
+router.get("/users/register", commonFuncs.checkAuthenticated, (req, res) => {
   res.render("register");
 });
 
-app.get("/users/login", checkAuthenticated, (req, res) => {
+router.get("/users/login", commonFuncs.checkAuthenticated, (req, res) => {
   res.render("login");
 });
 
-app.get("/users/dashboard", checkNotAutheticated, (req, res) => {
-  set_room_lists(req, res, room_lists, (req, res, room_lists) => {
-    res.render("dashboard", { user: req.user.name, room_lists: room_lists });
+router.get("/users/dashboard", commonFuncs.checkNotAutheticated, (req, res) => {
+  getRoomList(req, res, (req, res, roomList) => {
+    res.render("dashboard", { user: req.user.name, roomLists: roomList });
   });
 });
 
-app.get("/users/index", checkNotAutheticated, (req, res) => {
+router.get("/users/index", commonFuncs.checkNotAutheticated, (req, res) => {
   res.render("index", { user: req.user.name });
 });
 
-app.get("/users/logout", (req, res) => {
+router.get("/users/logout", (req, res) => {
   req.logout();
   req.flash("success_msg", "ログアウトを完了しました");
   res.redirect("/users/login");
 });
 
-app.post("/users/register", async (req, res) => {
+router.post("/users/register", async (req, res) => {
   const { name, email, password, password2 } = req.body;
 
   console.log({
@@ -51,7 +58,7 @@ app.post("/users/register", async (req, res) => {
   } else {
     const hashedPassword = await bcrypt.hash(password, 10);
     console.log(hashedPassword);
-    if (await checkExistence(DB_USER_TABLE, DB_USER_EMAIL_COLUMN, email)) {
+    if (await commonFuncs.checkExistence(DB_USER_TABLE, DB_USER_EMAIL_COLUMN, email)) {
       errors.push({ message: "このメールアドレスは既に登録されています" });
       res.render("register", { errors });
     } else {
@@ -76,7 +83,7 @@ app.post("/users/register", async (req, res) => {
   }
 });
 
-app.post(
+router.post(
   "/users/login",
   passport.authenticate("local", {
     successRedirect: "/users/dashboard",
@@ -85,7 +92,7 @@ app.post(
   })
 );
 
-function set_room_lists(req, res, room_lists, load_dashboard) {
+function getRoomList(req, res, loadDashboard) {
   pool.query(
     `SELECT * FROM chats WHERE user_id = $1`,
     [req.user.id],
@@ -93,9 +100,11 @@ function set_room_lists(req, res, room_lists, load_dashboard) {
       if (err) {
         throw err;
       }
-      room_lists = results.rows;
-      console.log(room_lists);
-      load_dashboard(req, res, room_lists);
+      const roomList = results.rows;
+      console.log(roomList);
+      loadDashboard(req, res, roomList);
     }
   );
 }
+
+module.exports = router;

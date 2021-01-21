@@ -1,3 +1,5 @@
+const { pool } = require("./dbConfig.js");
+
 function checkAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
     return res.redirect("/users/index");
@@ -18,3 +20,5 @@ async function checkExistence(table, column, val) {
     .then((res) => res.rows.length > 0)
     .catch((err) => console.log(err));
 }
+
+module.exports = { checkAuthenticated, checkNotAutheticated, checkExistence };
