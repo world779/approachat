@@ -20,11 +20,11 @@ var socket = io.connect({
 });
 
 socket.on("s2c_msg", function (data) {
-  appendMsg(data.msg, data.color);
+  appendMsg(data.msg, data.name, data.color);
 });
 
 socket.on("s2c_leave", function (data) {
-  appendMsg(data.msg, data.color);
+  appendMsg(data.msg, data.name, data.color);
   removeList(data.id);
 });
 
@@ -58,8 +58,8 @@ socket.on("initial_data", function (data) {
 });
 
 socket.on("s2c_join", function (data) {
-  appendMsg("入室しました", data.color);
-  appendAvatar(data.id, data.color, data.input_name);
+  appendMsg("入室しました", data.name, data.color);
+  appendAvatar(data.id, data.color, data.name);
   drawCurrentDist(data.id, data.dist);
   $(`.${data.id}`).css(
     "transform",
@@ -188,8 +188,8 @@ function removeList(id) {
   $(`#name-list > #${id}-name`).remove();
 }
 
-function appendMsg(text, color) {
-  $("#chatLogs").append(`<div style="color: ${color};">${text}</div>`);
+function appendMsg(text, name, color) {
+  $("#chatLogs").append(`<div style="color: ${color};">${name}: ${text}</div>`);
   var log = document.getElementById("chatLogs");
   log.scrollTop = log.scrollHeight;
 }

@@ -86,7 +86,7 @@ module.exports = function (io) {
                     io.to(MEMBER[socket.id].room).emit("s2c_join", {
                       id: MEMBER[socket.id].count,
                       color: data.color,
-                      input_name: data.input_name,
+                      name: data.input_name,
                       x: x,
                       y: y,
                       dist: MIN_DIST + MAX_DIST / 2,
@@ -124,7 +124,7 @@ module.exports = function (io) {
         var member = MEMBER[key];
         var dist = calcDist(member.x, member.y, sender.x, sender.y);
         if (dist < minDist && member.room == sender.room)
-          io.to(key).emit("s2c_msg", { msg: msg, color: sender.color });
+          io.to(key).emit("s2c_msg", { msg: msg, name: sender.input_name, color: sender.color });
       }, MEMBER);
     });
 
@@ -154,10 +154,9 @@ module.exports = function (io) {
     socket.on("c2s_leave", function (data) {
       if (TOKENS[socket.id] != data.token) return;
       try {
-        var msg = "退出しました";
         io.to(MEMBER[socket.id].room).emit("s2c_leave", {
           id: MEMBER[socket.id].count,
-          msg: msg,
+          name: MEMBER[socket.id].input_name,
           color: MEMBER[socket.id].color,
         });
         delete MEMBER[socket.id];
