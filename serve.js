@@ -63,9 +63,10 @@ app.get("/", (req, res) => {
   res.sendFile(DOCUMENT_ROOT + "/index.html");
 });
 
-app.get("/chat/*", async (req, res)=>{
+app.get("/chat/*", async (req, res) => {
   const roomName = req.url.slice(6);
-  if (await checkExistence(DB_ROOM_TABLE, DB_ROOM_NAME_COLUMN, roomName)) res.sendFile(DOCUMENT_ROOT + "/chat.html");
+  if (await checkExistence(DB_ROOM_TABLE, DB_ROOM_NAME_COLUMN, roomName))
+    res.sendFile(DOCUMENT_ROOT + "/chat.html");
   else res.send(`"${roomName}"という名前の部屋は登録されていません`);
 });
 
@@ -111,9 +112,7 @@ app.post("/new", checkNotAutheticated, async (req, res) => {
         `INSERT INTO chats (room_name, room_password, user_id)
             VALUES ($1, $2, $3)
             RETURNING room_name room_password`,
-        [
-          room_name, room_hashedPassword, req.user.id
-        ],
+        [room_name, room_hashedPassword, req.user.id],
         (err, results) => {
           if (err) {
             throw err;
@@ -188,9 +187,7 @@ app.post("/users/register", async (req, res) => {
         `INSERT INTO users (name, email, password)
             VALUES ($1, $2, $3)
             RETURNING id, password`,
-        [
-name, email, hashedPassword
-],
+        [name, email, hashedPassword],
         (err, results) => {
           if (err) {
             throw err;
@@ -311,6 +308,7 @@ io.on("connection", function (socket) {
                   io.to(socket.id).emit("initial_data", { data: MEMBER });
                   MEMBER[socket.id].room = data.room;
                   MEMBER[socket.id].color = data.color;
+                  MEMBER[socket.id].input_name = data.input_name;
                   socket.join(data.room);
                   var x = Math.floor(Math.random() * 100) * 5 + 2000;
                   var y = Math.floor(Math.random() * 100) * 5 + 2000;
@@ -319,20 +317,21 @@ io.on("connection", function (socket) {
                   io.to(MEMBER[socket.id].room).emit("s2c_join", {
                     id: MEMBER[socket.id].count,
                     color: data.color,
+                    input_name: data.input_name,
                     x: x,
                     y: y,
                     dist: MIN_DIST + MAX_DIST / 2,
                   });
                 } else {
                   io.to(socket.id).emit("auth_err", {
-                    text: "パスワードが正しくありません"
+                    text: "パスワードが正しくありません",
                   });
                 }
               }
             );
           } else {
             io.to(socket.id).emit("auth_err", {
-              text: `"${data.room}"という部屋はありません`
+              text: `"${data.room}"という部屋はありません`,
             });
           }
         }
@@ -401,7 +400,7 @@ async function checkExistence(table, column, val) {
   return pool
     .query(`SELECT * FROM ${table} WHERE ${column} = $1`, [val])
     .then((res) => res.rows.length > 0)
-    .catch((err)=>console.log(err));
+    .catch((err) => console.log(err));
 }
 
 function calcDist(x1, y1, x2, y2) {
