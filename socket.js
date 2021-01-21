@@ -8,14 +8,13 @@ const MIN_DIST = 50;
 const MAX_DIST = 500;
 const MAX_MSG_LENGTH = 2000;
 
-
 const { SECRET_TOKEN } = process.env;
 
 const MEMBER = {};
 const TOKENS = {};
 var MEMBER_COUNT = 1;
 
-module.exports = function (io){
+module.exports = function (io) {
   io.on("connection", function (socket) {
     (() => {
       // トークンを作成
@@ -117,7 +116,10 @@ module.exports = function (io){
       msg = xss(msg);
       var minDist = MEMBER[socket.id].dist;
       var sender = MEMBER[socket.id];
-      io.to(sender.room).emit("s2c_talking", { id: sender.count, dist: minDist });
+      io.to(sender.room).emit("s2c_talking", {
+        id: sender.count,
+        dist: minDist,
+      });
       Object.keys(MEMBER).forEach(function (key) {
         var member = MEMBER[key];
         var dist = calcDist(member.x, member.y, sender.x, sender.y);
@@ -165,7 +167,7 @@ module.exports = function (io){
       }
     });
   });
-}
+};
 
 function calcDist(x1, y1, x2, y2) {
   return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));

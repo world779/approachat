@@ -65,7 +65,7 @@ socket.on("s2c_join", function (data) {
     "transform",
     `translateX(${data.x}px) translateY(${data.y}px)`
   );
-  if(data.id == IAM.id) adjustViewPoint();
+  if (data.id == IAM.id) adjustViewPoint();
 });
 
 socket.on("s2c_move", function (data) {
@@ -88,12 +88,12 @@ socket.on("disconnect", function () {
   };
 });
 
-socket.on('auth_err',function(err){
+socket.on("auth_err", function (err) {
   $("#passForm").addClass("is-invalid");
   $("#pass-err").text(err.text);
 });
 
-window.onload = function(){
+window.onload = function () {
   console.log("loaded");
   var url = location.pathname;
   var roomName = url.replace("/chat/room/", "");
@@ -107,7 +107,7 @@ window.onload = function(){
       socket.emit("c2s_msg", { token: IAM.token, dist: dist, msg: message });
       $("#msgForm").val("");
     } else {
-      if(!socket.connected) socket.connect();
+      if (!socket.connected) socket.connect();
       var pass = $("#passForm").val();
       var input_name = $("#nameForm").val();
       IAM.room = roomName;
@@ -208,7 +208,7 @@ function toggleForm() {
     $("#chatForm").css("display", "none");
     $("#enterForm").css("display", "inline");
     // $("#disconnect").prop('disabled', true);
-  }else{
+  } else {
     $("#chatForm").css("display", "inline");
     $("#enterForm").css("display", "none");
     // $("#disconnect").prop('disabled', false);
@@ -240,18 +240,18 @@ function moveAvatar(id, x, y) {
   });
 }
 
-function adjustViewPoint(){
-  const y = $(`#${IAM.id}`).position().top * curScale - window.innerHeight/2;
-  const x = $(`#${IAM.id}`).position().left * curScale - window.innerWidth/2;
+function adjustViewPoint() {
+  const y = $(`#${IAM.id}`).position().top * curScale - window.innerHeight / 2;
+  const x = $(`#${IAM.id}`).position().left * curScale - window.innerWidth / 2;
   $("html,body").animate({
-      scrollTop: y,
-      scrollLeft: x
-    });
+    scrollTop: y,
+    scrollLeft: x,
+  });
 }
 
-function genRandColor(){
-  var hue = Math.floor(Math.random()*10)*36;
-  var sat = Math.floor(Math.random()*40)+25;
+function genRandColor() {
+  var hue = Math.floor(Math.random() * 10) * 36;
+  var sat = Math.floor(Math.random() * 40) + 25;
   var color = `hsla(${hue}, 50%, ${sat}%, 1)`;
 
   return color;

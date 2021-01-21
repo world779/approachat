@@ -7,7 +7,13 @@ const commonFuncs = require("../commonFuncs.js");
 
 router.get("/room/*", async (req, res) => {
   const roomName = req.url.slice(6);
-  if (await commonFuncs.checkExistence(DB_ROOM_TABLE, DB_ROOM_NAME_COLUMN, roomName))
+  if (
+    await commonFuncs.checkExistence(
+      DB_ROOM_TABLE,
+      DB_ROOM_NAME_COLUMN,
+      roomName
+    )
+  )
     res.sendFile(DOCUMENT_ROOT + "/chat.html");
   else res.send(`"${roomName}"という名前の部屋は登録されていません`);
 });
@@ -46,7 +52,13 @@ router.post("/new", commonFuncs.checkNotAutheticated, async (req, res) => {
     console.log(hashedPassword);
     console.log(req.user.id);
 
-    if (await commonFuncs.checkExistence(DB_ROOM_TABLE, DB_ROOM_NAME_COLUMN, roomName)) {
+    if (
+      await commonFuncs.checkExistence(
+        DB_ROOM_TABLE,
+        DB_ROOM_NAME_COLUMN,
+        roomName
+      )
+    ) {
       errors.push({ message: "この部屋名は既に登録されています" });
       res.render("new", { errors });
     } else {

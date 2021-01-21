@@ -7,7 +7,7 @@ const initializePassport = require("./passportConfig");
 
 var mime = {
   ".html": "text/html",
-  ".css": "text/css"
+  ".css": "text/css",
 };
 
 initializePassport(passport);
@@ -23,29 +23,30 @@ app.set("view engine", "ejs");
 
 app.use(express.urlencoded({ extended: false }));
 
-app.use(session({
+app.use(
+  session({
     secret: "secret",
 
     resave: false,
 
-    saveUninitialized: false
-  }));
+    saveUninitialized: false,
+  })
+);
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(flash());
 
-module.exports = { io, DOCUMENT_ROOT, passport }
+module.exports = { io, DOCUMENT_ROOT, passport };
 
 app.use(express.static(DOCUMENT_ROOT));
 app.use("/animejs", express.static(__dirname + "/node_modules/animejs/lib/"));
 
+app.use("/users", require("./router/users.js"));
+app.use("/chat", require("./router/chat.js"));
 
-app.use("/users",require("./router/users.js"));
-app.use("/chat",require("./router/chat.js"));
-
-app.get("/", (req, res)=>{
+app.get("/", (req, res) => {
   res.sendFile(DOCUMENT_ROOT + "/index.html");
 });
 

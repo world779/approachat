@@ -1,6 +1,6 @@
 var router = require("express").Router();
 
-const { passport } = require("../serve.js")
+const { passport } = require("../serve.js");
 const { pool, DB_USER_TABLE, DB_USER_EMAIL_COLUMN } = require("../dbConfig");
 const bcrypt = require("bcrypt");
 const commonFuncs = require("../commonFuncs.js");
@@ -58,7 +58,13 @@ router.post("/users/register", async (req, res) => {
   } else {
     const hashedPassword = await bcrypt.hash(password, 10);
     console.log(hashedPassword);
-    if (await commonFuncs.checkExistence(DB_USER_TABLE, DB_USER_EMAIL_COLUMN, email)) {
+    if (
+      await commonFuncs.checkExistence(
+        DB_USER_TABLE,
+        DB_USER_EMAIL_COLUMN,
+        email
+      )
+    ) {
       errors.push({ message: "このメールアドレスは既に登録されています" });
       res.render("register", { errors });
     } else {
