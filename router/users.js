@@ -15,7 +15,7 @@ router.get("/login", commonFuncs.checkAuthenticated, (req, res) => {
 
 router.get("/dashboard", commonFuncs.checkNotAutheticated, (req, res) => {
   getRoomList(req, res, (req, res, roomList) => {
-    res.render("dashboard", { user: req.user.name, roomLists: roomList });
+    res.render("dashboard", { user: req.user.name, roomList: roomList });
   });
 });
 
