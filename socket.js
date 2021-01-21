@@ -124,7 +124,11 @@ module.exports = function (io) {
         var member = MEMBER[key];
         var dist = calcDist(member.x, member.y, sender.x, sender.y);
         if (dist < minDist && member.room == sender.room)
-          io.to(key).emit("s2c_msg", { msg: msg, name: sender.input_name, color: sender.color });
+          io.to(key).emit("s2c_msg", {
+            msg: msg,
+            name: sender.input_name,
+            color: sender.color,
+          });
       }, MEMBER);
     });
 

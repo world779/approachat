@@ -60,6 +60,10 @@
   z-index: 1;
 }
 
+.name:hover {
+  cursor: pointer;
+}
+
 #welcome {
   position: absolute;
   width: 700px;

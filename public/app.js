@@ -177,7 +177,9 @@ function appendAvatar(id, color, input_name) {
   );
   $(`#${id}`).css("background-color", color);
   $(`#${id}-effect`).css("border", "1px solid " + color);
-  $("#name-list").append(`<li id="${id}-name">${input_name}</li>`);
+  $("#name-list").append(
+    `<li id="${id}-name" class="name" onclick="adjustViewPoint(${id})" style="color: ${color};">${input_name}</li>`
+  );
 }
 
 function removeAvatar() {
@@ -240,9 +242,9 @@ function moveAvatar(id, x, y) {
   });
 }
 
-function adjustViewPoint() {
-  const y = $(`#${IAM.id}`).position().top * curScale - window.innerHeight / 2;
-  const x = $(`#${IAM.id}`).position().left * curScale - window.innerWidth / 2;
+function adjustViewPoint(id = IAM.id) {
+  const y = $(`#${id}`).position().top * curScale - window.innerHeight / 2;
+  const x = $(`#${id}`).position().left * curScale - window.innerWidth / 2;
   $("html,body").animate({
     scrollTop: y,
     scrollLeft: x,
