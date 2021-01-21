@@ -90,7 +90,9 @@
       <div class="content">
         <a class="js-modal-open" href="">使い方を表示</a>
       </div>
-      <ul id="name-list"></ul>
+      <ul id="name-list" class="d-none d-sm-none d-md-block">
+        <h4 class="mt-4">ユーザ一覧</h4>
+      </ul>
       <div class="modal js-modal">
         <div class="modal__bg js-modal-close"></div>
         <div class="modal__content">
@@ -98,7 +100,7 @@
             <ol class="carousel__viewport">
               <li id="carousel__slide1" tabindex="0" class="carousel__slide">
                 <p class="slide1__content">
-                  移動したい場所にカーソルを合わせてダブルクリックすると、そこにアバターが移動します。
+                  移動したい場所にカーソルを合わせてクリックすると、そこにアバターが移動します。
                 </p>
                 <video
                   src="../img/slide1.mp4"
@@ -128,7 +130,7 @@
                 <a href="#carousel__slide4" class="carousel__next"></a>
               </li>
               <li id="carousel__slide4" tabindex="0" class="carousel__slide">
-                <p class="slide1__content">*****************</p>
+                <p class="slide1__content">自分のアバターの周りの輪の中の人に発言が届きます。</p>
                 <!-- 動画か画像を入れる -->
                 <div class="carousel__snapper"></div>
                 <a href="#carousel__slide3" class="carousel__prev"></a>
