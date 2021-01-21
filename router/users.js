@@ -5,31 +5,31 @@ const { pool, DB_USER_TABLE, DB_USER_EMAIL_COLUMN } = require("../dbConfig");
 const bcrypt = require("bcrypt");
 const commonFuncs = require("../commonFuncs.js");
 
-router.get("/users/register", commonFuncs.checkAuthenticated, (req, res) => {
+router.get("/register", commonFuncs.checkAuthenticated, (req, res) => {
   res.render("register");
 });
 
-router.get("/users/login", commonFuncs.checkAuthenticated, (req, res) => {
+router.get("/login", commonFuncs.checkAuthenticated, (req, res) => {
   res.render("login");
 });
 
-router.get("/users/dashboard", commonFuncs.checkNotAutheticated, (req, res) => {
+router.get("/dashboard", commonFuncs.checkNotAutheticated, (req, res) => {
   getRoomList(req, res, (req, res, roomList) => {
     res.render("dashboard", { user: req.user.name, roomLists: roomList });
   });
 });
 
-router.get("/users/index", commonFuncs.checkNotAutheticated, (req, res) => {
+router.get("/index", commonFuncs.checkNotAutheticated, (req, res) => {
   res.render("index", { user: req.user.name });
 });
 
-router.get("/users/logout", (req, res) => {
+router.get("/logout", (req, res) => {
   req.logout();
   req.flash("success_msg", "ログアウトを完了しました");
-  res.redirect("/users/login");
+  res.redirect("/login");
 });
 
-router.post("/users/register", async (req, res) => {
+router.post("/register", async (req, res) => {
   const { name, email, password, password2 } = req.body;
 
   console.log({
@@ -82,7 +82,7 @@ router.post("/users/register", async (req, res) => {
             "success_msg",
             "登録が完了しました。ログインしてください。"
           );
-          res.redirect("/users/login");
+          res.redirect("/login");
         }
       );
     }
@@ -90,10 +90,10 @@ router.post("/users/register", async (req, res) => {
 });
 
 router.post(
-  "/users/login",
+  "/login",
   passport.authenticate("local", {
-    successRedirect: "/users/dashboard",
-    failureRedirect: "/users/login",
+    successRedirect: "/dashboard",
+    failureRedirect: "/login",
     failureFlash: true,
   })
 );
