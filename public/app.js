@@ -173,7 +173,7 @@ window.onbeforeunload = function () {
 
 function appendAvatar(id, color, input_name) {
   $("#field").append(
-    `<div id=${id} class="avatar ${id}">${id}<div id=${id}-effect class="avatar-effect"></div></div>`
+    `<div id=${id} class="avatar ${id}">${input_name}<div id=${id}-effect class="avatar-effect"></div></div>`
   );
   $(`#${id}`).css("background-color", color);
   $(`#${id}-effect`).css("border", "1px solid " + color);
