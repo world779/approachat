@@ -144,7 +144,9 @@ window.onload = function () {
   //   IAM.isEnter = false;
   // });
 
-  $("#resetView").click(adjustViewPoint);
+  $("#resetView").click(function () {
+    adjustViewPoint(IAM.id);
+  });
 
   $("#zoomIn").click(function () {
     const field = document.getElementById("field");
