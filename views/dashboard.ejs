@@ -63,7 +63,7 @@
                 <!-- <span data-feather="calendar"></span> -->
                 <!-- This week -->
                 <div class="dropdown-menu" aria-labelledby="ルーム管理">
-                  <% for ( let i = 0; i < room_lists.length; i++) { %>
+                  <% for ( let i = 0; i < roomList.length; i++) { %>
                     <a href="/chat/room/<%= room_lists[i].room_name %>" class="dropdown-item"><%= room_lists[i].room_name %></a>
                   <% } %>
                 </div>
