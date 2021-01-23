@@ -16,7 +16,7 @@
 
 #container-util {
   position: fixed;
-  height: 600px;
+  height: auto;
   width: 250px;
   padding: 20px;
   background-color: white;
