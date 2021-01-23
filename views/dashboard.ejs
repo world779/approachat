@@ -1,77 +1,55 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <title>ダッシュボード</title>
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <link
-      rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
-    />
-    <!-- <link rel="stylesheet" type="text/css" href="../public/index.css" /> -->
-  </head>
-  <body>
-    <a id="skippy" class="sr-only sr-only-focusable" href="#content">
-      <div class="container">
-        <span class="skiplink-text">Skip to main content</span>
-      </div>
-    </a>
-
-    <nav class="navbar navbar-dark bg-dark flex-md-nowrap p-0 shadow">
-      <!-- <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Company name</a> -->
-      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#"
-        >Start chatting!</a
-      >
-      <ul class="navbar-nav px-3">
-        <li class="nav-item text-nowrap">
-          <!-- <a class="nav-link" href="#">Sign out</a> -->
-          <a class="nav-link" href="/users/logout">ログアウト</a>
-        </li>
-      </ul>
-    </nav>
-
-    <div class>
-      <div class="row">
-        <main role="main" class="col-md-9 col-lg-10 px-4">
-          <div
-            class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <!-- <h1 class="h2">Dashboard</h1> -->
-            <h1 class="h2">ダッシュボード<%= user %></h1>
-          </div>
-          <div class="btn-toolbar mb-2 mb-md-0">
-            <div class="btn-group mr-2">
-              <!-- <button type="button" class="btn btn-sm btn-outline-secondary">Share</button> -->
-              <!-- <button type="button" class="btn btn-sm btn-outline-secondary"> -->
-              <!--   <a href="/users/index">入室</a>                             -->
-              <!-- </button>                                                       -->
-              <!-- <button type="button" class="btn btn-sm btn-outline-secondary">Export</button> -->
-              <button type="button" class="btn btn-sm btn-outline-secondary">
-                <a href="/chat/new">新規作成</a>
-              </button>
+    <head>
+        <meta charset="UTF-8" />
+        <title>ダッシュボード</title>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+        <link
+            rel="stylesheet"
+            href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+            />
+        <!-- <link rel="stylesheet" type="text/css" href="../public/index.css" /> -->
+    </head>
+    <body>
+        <main role="main" class="px-3">
+            <div
+                class="d-flex align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">ダッシュボード</h1>
             </div>
-            <div class="dropdown">
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-secondary dropdown-toggle"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false">
-                ルーム管理
-              </button>
-                <!-- <span data-feather="calendar"></span> -->
-                <!-- This week -->
-                <div class="dropdown-menu" aria-labelledby="ルーム管理">
-                  <% for ( let i = 0; i < roomList.length; i++) { %>
-                    <a href="/chat/room/<%= roomList[i].room_name %>" class="dropdown-item"><%= roomList[i].room_name %></a>
-                  <% } %>
+
+            <p>こんにちは、<%= user %>さん</p>
+            <div class="btn-toolbar mb-2">
+                <div class="input-group">
+                    <input type="text" class="form-control mr-2" placeholder="部屋の名前を入力">
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-secondary">
+                    <a href="/users/index">入室</a>
+                </button>
+            </div>
+            <div class="btn-toolbar mb-2">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-sm btn-outline-secondary">
+                        <a href="/chat/new">新規作成</a>
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                        data-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-expanded="false">
+                        ルーム管理
+                    </button>
+                    <!-- <span data-feather="calendar"></span> -->
+                    <!-- This week -->
+                    <div class="dropdown-menu" aria-labelledby="ルーム管理">
+                        <% for ( let i = 0; i < roomList.length; i++) { %>
+                        <a href="/chat/room/<%= roomList[i].room_name %>" class="dropdown-item"><%= roomList[i].room_name %></a>
+                        <% } %>
+                    </div>
                 </div>
             </div>
-          </div><br>
-          <h2>こんにちは、<%= user %>さん</h2>
         </main>
-      </div>
-    </div>
-  </body>
+    </body>
 </html>
