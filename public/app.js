@@ -24,7 +24,7 @@ socket.on("s2c_msg", function (data) {
 });
 
 socket.on("s2c_leave", function (data) {
-  appendMsg(data.msg, data.name, data.color);
+  appendMsg(`退出しました`, data.name, data.color);
   removeList(data.id);
 });
 
@@ -43,6 +43,10 @@ socket.on("token", function (data) {
 
 socket.on("initial_data", function (data) {
   toggleForm();
+  $("#invitation").val(`Approachatの部屋「${IAM.room}」で一緒に話しませんか？
+URL: ${location.href}
+パスワード: ${$("#passForm").val()}`);
+  $("#invitation-dropdown").removeClass("d-none");
   IAM.isEnter = true;
   Object.keys(data.data).forEach(function (key) {
     var member = this[key];
