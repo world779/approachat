@@ -293,3 +293,9 @@ function drawCurrentDist(id, dist) {
     easing: "linear",
   });
 }
+
+function copyInvitation(){
+  var invitation = document.getElementById("invitation");
+  invitation.select();
+  document.execCommand("copy");
+}
