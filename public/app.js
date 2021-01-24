@@ -59,6 +59,7 @@ URL: ${location.href}
       drawCurrentDist(member.count, member.dist);
     }
   }, data.data);
+  tutorial(tutorials);
 });
 
 socket.on("s2c_join", function (data) {
