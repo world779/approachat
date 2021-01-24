@@ -5,12 +5,12 @@
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
-      />
+    />
     <title>websocket-chat</title>
     <link
       rel="stylesheet"
       href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
-      />
+    />
     <link rel="stylesheet" href="/chat.css" />
     <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
     <script src="https://www.google.com/recaptcha/api.js"></script>
@@ -29,20 +29,26 @@
         <form id="enterForm">
           <div class="for-row">
             <label id="nameLabel" for="nameForm">表示名</label>
-            <input type="text" id="nameForm" class="form-control" />
+            <input
+              type="text"
+              id="nameForm"
+              class="form-control"
+              autocomplete="username"
+            />
             <label class="mt-2" id="passLabel" for="passForm"></label>
             <input
               type="password"
               class="form-control form-pass"
               id="passForm"
               maxlength="30"
-              />
+              autocomplete="current-password"
+            />
             <div class="invalid-feedback text-left" id="pass-err"></div>
             <button
               type="submit"
               class="btn btn-primary btn-block mt-3"
               id="enterButton"
-              >
+            >
               入室
             </button>
           </div>
@@ -55,9 +61,11 @@
               id="msgForm"
               class="form-control"
               autocomplete="off"
-              />
+            />
             <div class="text-danger" id="msgError"></div>
-            <label class="mt-3 mb-0" id="nameLabel" for="dist">伝わる距離</label>
+            <label class="mt-3 mb-0" id="nameLabel" for="dist"
+              >伝わる距離</label
+            >
             <input
               type="range"
               id="dist"
@@ -65,19 +73,19 @@
               min="0"
               max="100"
               value="50"
-              />
+            />
             <button
               type="submit"
               class="btn btn-primary btn-block mt-3"
               id="sendButton"
-              >
+            >
               送信
             </button>
           </div>
         </form>
       </div>
       <div class="my-3" id="chatLogs"></div>
-      <div class="btn-group" role="group">
+      <div id="viewTool" class="btn-group" role="group">
         <button type="button" class="btn btn-secondary" id="resetView">
           視点をリセット
         </button>
@@ -90,20 +98,25 @@
           class="btn btn-success dropdown-toggle"
           data-toggle="dropdown"
           aria-haspopup="true"
-          aria-expanded="false">
+          aria-expanded="false"
+        >
           招待をコピー
         </button>
         <div class="dropdown-menu text-right px-1">
-          <textarea id="invitation" class="form-control" rows=2></textarea>
-          <button class="btn btn-sm btn-secondary mr-1 mt-1" onclick=copyInvitation();>コピー</button>
+          <textarea id="invitation" class="form-control" rows="2"></textarea>
+          <button
+            class="btn btn-sm btn-secondary mr-1 mt-1"
+            onclick="copyInvitation();"
+          >
+            コピー
+          </button>
         </div>
       </div>
       <!-- <button type="button" class="btn btn-danger" id="disconnect" disabled>退出</button> -->
     </div>
     <div id="namebar" class="d-none d-sm-none d-md-block">
       <h4 class="mt-4">ユーザ一覧</h4>
-      <ul id="name-list">
-      </ul>
+      <ul id="name-list"></ul>
     </div>
 
     <div class="modal fade" id="tutorial" tabindex="-1" role="dialog">
@@ -111,15 +124,28 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="tutorial-title"></h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div class="modal-body" id="turorial-text">
-          </div>
+          <div class="modal-body" id="tutorial-text"></div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" id="button-skip" data-dismiss="modal">スキップ</button>
-            <button type="button" class="btn btn-primary" id="button-next">次へ</button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              id="button-skip"
+              data-dismiss="modal"
+            >
+              スキップ
+            </button>
+            <button type="button" class="btn btn-primary" id="button-next">
+              次へ
+            </button>
           </div>
         </div>
       </div>
@@ -131,7 +157,7 @@
       <img
         id="amusement-park"
         src="/img/objects/undraw_amusement_park_17oe.svg"
-        />
+      />
       <img id="home" src="/img/objects/undraw_at_home_octe.svg" />
       <img id="tree" src="/img/objects/undraw_playing_fetch_cm19.svg" />
       <img id="yacht" src="/img/objects/undraw_Yacht_re_kkai.svg" />
@@ -154,12 +180,12 @@
       src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
       integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
       crossorigin="anonymous"
-      ></script>
+    ></script>
     <script
       src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
       integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
       crossorigin="anonymous"
-      ></script>
+    ></script>
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
     <script src="/animejs/anime.min.js"></script>
     <script src="/tutorial.js"></script>

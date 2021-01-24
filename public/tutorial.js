@@ -1,3 +1,76 @@
+const tutorials = [
+  {
+    title: "ようこそApproachatへ！",
+    text:
+      "Approachatはアバターを動かしながらチャットができるアプリです。今から基本的な操作方法をお教えします！",
+    view: true,
+  },
+  {
+    title: "アバターを動かしてみよう",
+    text: "自分のアバターを自由に動かすことができます。",
+  },
+  {
+    text: "画面の操作バー以外の部分をクリックしてみてください。",
+    hide: true,
+  },
+  {
+    element: document.getElementById("field"),
+    event: "click",
+  },
+  {
+    title: "範囲を変えてみよう",
+    text:
+      "青いバーをドラッグして動かすとメッセージが伝わる範囲が変わります。あなたのアバターの外側の円の中にいる人にあなたのメッセージが届きます。",
+    view: true,
+  },
+  {
+    text: "外側の円の大きさが変わるのを操作して試してみてください。",
+    hide: true,
+  },
+  {
+    element: document.getElementById("dist"),
+    event: "click",
+  },
+  {
+    title: "メッセージを送ってみよう",
+    text: "フォームに文字を入力し，送信ボタンを押すとメッセージを送れます。",
+    view: true,
+  },
+  {
+    text: "送られた文字は送信ボタンの下の欄に表示されます。",
+    hide: true,
+  },
+  {
+    element: document.getElementById("msgForm"),
+    event: "send",
+  },
+  {
+    title: "視点操作",
+    text: "フィールドを拡大縮小したり，自分を視点の中心に戻したりできます。",
+    view: true,
+  },
+  {
+    text: "操作バーの左下の「視点をリセット」ボタンを押してみてください。",
+    hide: true,
+  },
+  {
+    element: document.getElementById("viewTool"),
+    event: "click",
+  },
+  {
+    title: "さあ，チャットを始めよう！",
+    text: "会話がされていそうなところへ近づいて話してみましょう",
+    view: true,
+    hide: true,
+  },
+];
+
+$(document).keypress(function (e) {
+  if (e.which == 13) {
+    $("#button-next").click();
+  }
+});
+
 function highlightElement(element) {
   const style = window.getComputedStyle(element);
   const bgColor = style.getPropertyValue("background-color");
@@ -22,67 +95,42 @@ function highlightElement(element) {
   return [borderColor, bgColor, tl];
 }
 
-const tutorials = [
-  [
-    {
-      title: "ようこそapproachatへ！",
-      text: "基本的な操作方法をお教えします！",
-    },
-    {
-      title: "範囲を変えてみよう",
-      text: "スライダーを動かすと伝わる範囲が変わります",
-      element: document.getElementById("dist"),
-    },
-  ],
-  [
-    {
-      title: "メッセージを送ってみよう",
-      text: "フォームに文字を入力し，送信ボタンを押すとメッセージを送れます",
-    },
-    {
-      title: "範囲を変えてみよう",
-      text: "スライダーを動かすと伝わる範囲が変わります",
-    },
-    {
-      title: "範囲",
-      text: "スライダーを動かすと伝わる範囲が変わります",
-    },
-  ],
-];
-
-function tutorial(arr, chapterNum = 0, contentNum = 0) {
-  const content = arr[chapterNum][contentNum];
-  if (contentNum == 0) {
+function tutorial(arr, num = 0) {
+  const content = arr[num];
+  if (content.view) {
     $("#tutorial").modal();
   }
-  $("#tutorial-title").text(content.title);
-  $("#tutorial-text").text(content.text);
-
-  $("#button-next").one("click", function (e) {
-    if (contentNum == arr[chapterNum].length - 1) {
-      $("#tutorial").modal("hide");
-      if (chapterNum == arr.length - 1) return;
-      if (content.element) {
-        const [borderColor, bgColor, tl] = highlightElement(content.element);
-        content.element.addEventListener(
-          "click",
-          function (e) {
-            tl.pause();
-            anime({
-              targets: content.element,
-              borderColor: borderColor,
-              backgroundColor: bgColor,
-              borderWidth: 1,
-            });
-            tutorial(arr, chapterNum + 1, 0);
-          },
-          {
-            once: true,
-          }
-        );
-      }
-    } else {
-      tutorial(arr, chapterNum, contentNum + 1);
+  if (content.title) $("#tutorial-title").text(content.title);
+  if (content.text) $("#tutorial-text").text(content.text);
+  if (content.element) {
+    const [borderColor, bgColor, tl] = highlightElement(content.element);
+    if (content.event) {
+      $(content.element).one(content.event, function (e) {
+        tl.pause();
+        anime({
+          targets: content.element,
+          borderColor: borderColor,
+          backgroundColor: bgColor,
+          borderWidth: 1,
+        });
+        tutorial(arr, num + 1);
+      });
     }
-  });
+  } else {
+    if (num == arr.length - 1) {
+      $("#button-next").text("わかった！");
+      $("#button-skip").text("もう一回！");
+      $("#button-skip").one("click", function (e) {
+        //うまくいかない
+        $("#button-next").text("次へ");
+        $("#button-skip").text("スキップ");
+        tutorial(arr, 0);
+      });
+    }
+    $("#button-next").one("click", function (e) {
+      if (content.hide) $("#tutorial").modal("hide");
+      if (num == arr.length - 1) return;
+      tutorial(arr, num + 1);
+    });
+  }
 }

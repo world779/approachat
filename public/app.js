@@ -111,6 +111,7 @@ window.onload = function () {
       var dist = $("#dist").val();
       socket.emit("c2s_msg", { token: IAM.token, dist: dist, msg: message });
       $("#msgForm").val("");
+      $("#msgForm").trigger("send");
     } else {
       if (!socket.connected) socket.connect();
       var pass = $("#passForm").val();
@@ -133,6 +134,7 @@ window.onload = function () {
     var x = e.pageX / curScale;
     var y = e.pageY / curScale;
     socket.emit("c2s_move", { token: IAM.token, x: x, y: y });
+    $(`#field`).trigger("move");
   });
 
   $("#dist").change(onDistChange);
