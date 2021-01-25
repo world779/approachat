@@ -2,7 +2,7 @@
 <html lang="ja">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>websocket-chat</title>
         <link
             rel="stylesheet"
@@ -10,8 +10,8 @@
             />
     </head>
     <div class="sticky-top">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom border-dark shadow-sm">
-            <a class="navbar-brand" href="#top">chat tool</a>
+        <nav class="navbar navbar-expand-lg navbar-light border-bottom border-dark shadow-sm" style="background-color:#fff;">
+            <a class="navbar-brand" href="#top"><img src="./img/logo.png"/ width=200></a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -19,6 +19,9 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
+                        <a class="nav-link" href="#concept">concept</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="#about">about</a>
                     </li>
                     <li class="nav-item">
@@ -41,43 +44,59 @@
         </nav>
     </div>
     <body>
-        <div id="top" class="position-relative overflow-hidden p-3 p-md-5 text-center bg-light border-bottom border-dark">
-            <div class="col-md-5 p-lg-5 mx-auto my-5">
-                <h1 class="display-4 fw-normal">気軽に話せる多人数テキストチャット</h1>
-                <p class="lead fw-normal">
-                　新しいコミュニティで交友関係を作るのは難しいと思っていませんか？
-                </p>
-                <p class="lead fw-normal">
-                　「気まずい」要素を減らしたこのチャットなら，もっと簡単にアイスブレイクができます！
-                </p>
-                <a class="btn btn-success btn-lg" href="users/register" role="button">登録する</a>
+        <div id="top" class="position-relative overflow-hidden p-3 p-md-5 text-center bg-light  border-dark">
+            <div class="col-md-7 my-5">
+                <h1 class="display-3 fw-normal">APPROACHAT</h1>
             </div>
         </div>
-        <div id="about" class="position-relative overflow-hidden p-3 p-md-5 text-center bg-light border-bottom border-dark">
-            <div class="col-md-5 p-lg-5 mx-auto my-5">
-                <h1 class="display-5 fw-normal">会話を始めるのに困った経験はありませんか？</h1>
-                <p class="lead fw-normal pt-3">
-                　このチャットツールは，コミュニケーションが苦手な人もそうでない人も楽しく使えることを目指したツールです。
-                </p>
-                <p class="lead fw-normal">
-                　チャットをしている間は，自分の素性を表明する必要がないので，コミュニケーションがうまくいかなくても心配する必要はありません。
-                </p>
-                <p class="lead fw-normal">
-                　もしあなたが既に始まっている会話には入りにくいと感じていたとしても，少し近づいて，まずは断片的に内容を聞いてみるところから始めることができます。
-                </p>
+        <div id="concept" class="position-relative overflow-hidden text-center bg-light  border-dark text-white">
+            <div class="row">
+                <div class="col-md-2"></div>
+                <div class="col-md-10 py-5 black-box">
+                    <div class="black-content">
+                        <h1 class="display-3 fw-normal vertical-middle font-weight-bold">気軽に話せる<br>多人数テキストチャット</h1><br><br>
+                        <p class="lead fw-normal vertical-middle font-weight-bold">
+                        新しいコミュニティで交友関係を作るのは難しいと思っていませんか？
+                        </p>
+                        <p class="lead fw-normal vertical-middle font-weight-bold">
+                        「気まずい」要素を減らしたこのチャットなら，もっと簡単にアイスブレイクができます！
+                        </p><br><br>
+                        <a class="btn btn-success btn-lg" href="users/register" role="button">登録する</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="about" class="position-relative overflow-hidden  text-center bg-light border-bottom border-dark pl-">
+            <div class="row ml-5 pl-5 pt-5">
+                <h1 class="display-2 fw-normal vertical-middle font-weight-bold  mt-5">about</h1>
+            </div>
+            <div class="row ml-5 pl-5">
+                <div class="col-md-5  my-5"></div>
+                <div class="col-md-6  my-5">
+                    <h1 class="display-5 fw-normal">会話を始めるのに困った経験は<br>ありませんか？</h1>
+                    <p class="lead fw-normal pt-3">
+                    このチャットツールは，コミュニケーションが苦手な人もそうでない人も楽しく使えることを目指したツールです。
+                    </p>
+                    <p class="lead fw-normal">
+                    チャットをしている間は，自分の素性を表明する必要がないので，コミュニケーションがうまくいかなくても心配する必要はありません。
+                    </p>
+                    <p class="lead fw-normal">
+                    もしあなたが既に始まっている会話には入りにくいと感じていたとしても，少し近づいて，まずは断片的に内容を聞いてみるところから始めることができます。
+                    </p>
+                </div>
             </div>
         </div>
         <div id="feature" class="position-relative overflow-hidden p-3 p-md-5 text-center bg-light border-bottom border-dark">
-            <div class="col-md-5 p-lg-5 mx-auto my-5">
-                <h1 class="display-5 fw-normal">使い方と機能</h1>
-                <p class="lead fw-normal pt-3">1. ユーザ登録して部屋を作る</p>
-                <p class="lead fw-normal">2. みんなに招待のリンクとパスワードを知らせる</p>
-                <p class="lead fw-normal">3. アバターを動かして，メッセージを送ってみよう</p>
+            <div class="col-md-10 p-lg-5 mx-auto my-5">
+                <h1 class="display-4 fw-normal font-weight-bold mb-5">使い方と機能</h1><br><br>
+                <div class="lead fw-normal pt-3 maru font-weight-bold"><span>1.</span><br>ユーザ登録して<br>部屋を作る<br><br><br></div>
+                <div class="lead fw-normal maru font-weight-bold"><span>2.</span><br> みんなに招待のリンクと<br>パスワードを知らせる<br><br></div>
+                <div class="lead fw-normal maru font-weight-bold"><span>3.</span><br> アバターを動かして，<br>メッセージを送ってみよう<br><br></div>
             </div>
         </div>
         <div id="register" class="position-relative overflow-hidden p-3 p-md-5 text-center bg-light border-bottom border-dark">
-            <div class="col-md-5 p-lg-5 mx-auto my-5">
-                <h1 class="display-4 fw-normal">さあ，使ってみましょう！</h1>
+            <div class="col-md-10 p-lg-5 mx-auto my-5">
+                <h1 class="display-4 fw-normal">さあ，使ってみましょう！</h1><br>
                 <a class="btn btn-success btn-lg mt-3" href="users/register" role="button">登録する</a>
             </div>
         </div>
@@ -108,3 +127,75 @@
 
     </body>
 </html>
+<style type="text/css" media="screen">
+    #top {
+        background-image: url("/img/objects/undraw_amusement_park_17oe.svg");
+        background-repeat: no-repeat;
+        background-position: right bottom;  
+        background-size: 63%;
+        height: 750px;
+    }
+    #top h1 {
+        font-size: 8vw;
+        font-weight: 600; 
+    }
+    #concept h1 {
+        font-size: 3vw;
+        line-height: 5rem;
+        /*padding-top: 130px;*/
+    }
+    .black-box {
+        background-color: black;
+        /*height: 600px;*/
+        text-align: left;
+        padding-left: 100px;
+    }
+    .black-content {
+        margin: 160px 0;
+    }
+    .vertical-middle {
+        display: inline-block;
+        vertical-align: middle;
+    }
+    #about {
+        background-image: url("/img/objects/undraw_playing_fetch_cm19.svg");
+        background-repeat: no-repeat;
+        background-position: left 15% bottom;
+        background-size: 40%;
+    }
+    #about h1{
+        text-align: left;
+        font-weight: 600; 
+    }
+    #about p{
+        text-align: left;
+    }
+    .maru {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        flex-flow: column; 
+        vertical-align: top;
+        width: 300px;
+        height: 300px;
+        color: black;
+        border: 4px solid black;
+        margin-right: 50px;
+    }
+    .maru:last-child {
+        margin: 0;
+    }
+    #feature span {
+        font-size: 30px;
+    }
+    @media screen and (max-width: 900px) {
+    #top {
+        height: 400px;
+    }
+    #concept h1 {
+        font-size: 30px;
+    }
+    }
+
+</style>
