@@ -25,6 +25,7 @@ socket.on("s2c_msg", function (data) {
 
 socket.on("s2c_leave", function (data) {
   appendMsg(`退出しました`, data.name, data.color);
+  $(`#${data.id}`).remove();
   removeList(data.id);
 });
 

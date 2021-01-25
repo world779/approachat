@@ -79,8 +79,8 @@ module.exports = function (io) {
                     MEMBER[socket.id].color = data.color;
                     MEMBER[socket.id].input_name = data.input_name;
                     socket.join(data.room);
-                    var x = Math.floor(Math.random() * 100) * 5 + 2000;
-                    var y = Math.floor(Math.random() * 100) * 5 + 2000;
+                    var x = Math.floor(Math.random() * 1000) + 2000;
+                    var y = Math.floor(Math.random() * 1000) + 2000;
                     MEMBER[socket.id].x = x;
                     MEMBER[socket.id].y = y;
                     io.to(MEMBER[socket.id].room).emit("s2c_join", {
