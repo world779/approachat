@@ -9,14 +9,40 @@ const password = "demodemo";
 const interval = 500;
 const ratio = 0.2;
 const numOfPeople = 20;
+const kana = [
+  "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわぱぴぷぺぽ",
+  "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワパピプペポ",
+];
 
 const messages = [
   "こんにちは",
   "はじめまして",
   "大変ですね",
   "そうなの？",
+  "何話しましょうか",
+  "猫は最高ですね",
+  "おすすめしたいものってあります？",
+  "意外です",
+  "キャンプに行きたい",
+  "<script>alert();</script>",
   "これってどうすればいいんですか？",
   "私もです",
+  "ステキです！",
+  "絵のあるところで話しましょうか",
+  "はい",
+  "やっほー",
+  "聞こえますか？",
+  "いい季節ですよね",
+  "お腹すいたな",
+  "どこへ行こうかな",
+  "おーーーい",
+  "難しいな",
+  "音楽聴きますか？",
+  "なるほど",
+  "かわいい",
+  "了解",
+  "テスト",
+  "見えてる？",
 ];
 
 for (let i = 0; i < numOfPeople; i++) {
@@ -112,7 +138,7 @@ function randomAct() {
           token: NPC[i].token,
           room: roomName,
           color: genRandColor(),
-          input_name: "test",
+          input_name: genName(),
           password: password,
         });
       }
@@ -138,3 +164,15 @@ let genDistChange = () => Math.floor(Math.random() * 100);
 let genMove = () => Math.floor(Math.random() * 1000) - 500;
 
 let genMessage = () => messages[Math.floor(Math.random() * messages.length)];
+
+function genName() {
+  let name = "";
+  const num = Math.floor(Math.random() * 3) + 2;
+  const type = Math.random() < 0.5 ? 1 : 0;
+  for (i = 0; i < num; i++) name += randKana(type);
+
+  return name;
+}
+
+let randKana = (type) =>
+  kana[type][Math.floor(Math.random() * kana[type].length)];
