@@ -240,14 +240,14 @@ function validateMsgLength() {
 
 function moveAvatar(id, x, y) {
   const avatar = document.getElementById(id);
-  if ((id = IAM.id)) IAM.isMoving = true;
+  if (id == IAM.id) IAM.isMoving = true;
   anime({
     targets: avatar,
     translateX: x,
     translateY: y,
     easing: "linear",
     complete: function (anim) {
-      if ((id = IAM.id)) IAM.isMoving = false;
+      if (id == IAM.id) IAM.isMoving = false;
     },
   });
 }
@@ -302,7 +302,7 @@ function drawCurrentDist(id, dist) {
   });
 }
 
-function copyInvitation(){
+function copyInvitation() {
   var invitation = document.getElementById("invitation");
   invitation.select();
   document.execCommand("copy");

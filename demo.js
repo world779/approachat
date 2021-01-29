@@ -103,8 +103,8 @@ for (let i = 0; i < numOfPeople; i++) {
 }
 
 process.on("SIGINT", function () {
-  for (i in sockets)
-    sockets[i].emit("c2s_leave", { token: NPC[i].token, id: NPC[i].id });
+  // for (i in sockets)
+  //   sockets[i].emit("c2s_leave", { token: NPC[i].token, id: NPC[i].id });
   process.exit(0);
 });
 
@@ -138,7 +138,7 @@ function randomAct() {
           token: NPC[i].token,
           room: roomName,
           color: genRandColor(),
-          input_name: genName(),
+          input_name: "",//genName(),
           password: password,
         });
       }

@@ -77,7 +77,7 @@ module.exports = function (io) {
                     io.to(socket.id).emit("initial_data", { data: MEMBER });
                     MEMBER[socket.id].room = data.room;
                     MEMBER[socket.id].color = data.color;
-                    MEMBER[socket.id].input_name = data.input_name;
+                    MEMBER[socket.id].input_name = xss(data.input_name);
                     socket.join(data.room);
                     var x = Math.floor(Math.random() * 1000) + 2000;
                     var y = Math.floor(Math.random() * 1000) + 2000;
@@ -86,7 +86,7 @@ module.exports = function (io) {
                     io.to(MEMBER[socket.id].room).emit("s2c_join", {
                       id: MEMBER[socket.id].count,
                       color: data.color,
-                      name: data.input_name,
+                      name: MEMBER[socket.id].input_name,
                       x: x,
                       y: y,
                       dist: MIN_DIST + MAX_DIST / 2,
