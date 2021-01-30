@@ -28,14 +28,14 @@ function initialize(passport) {
             } else {
               //password is incorrect
               return done(null, false, {
-                message: "パスワードが正しくありません",
+                message: "パスワードかメールアドレスが正しくありません",
               });
             }
           });
         } else {
           // No user
           return done(null, false, {
-            message: "このメールアドレスのユーザーは登録されていません",
+            message: "パスワードかメールアドレスが正しくありません",
           });
         }
       }
