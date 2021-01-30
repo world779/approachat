@@ -137,7 +137,6 @@ module.exports = function (io) {
       if (dist > 100) dist = 100;
       dist = (dist * MAX_DIST) / 100 + MIN_DIST;
       MEMBER[socket.id].dist = dist;
-      console.log(dist);
       io.to(MEMBER[socket.id].room).emit("s2c_dist", {
         id: MEMBER[socket.id].count,
         dist: dist,

@@ -287,8 +287,6 @@ function drawCurrentDist(id, dist) {
     height: dist * 2,
     width: dist * 2,
     borderRadius: dist,
-    // translateX: "+=fix",
-    // translateY: "+=fix",
     easing: "linear",
   });
 }
