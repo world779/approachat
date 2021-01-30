@@ -108,25 +108,26 @@ module.exports = function (io) {
     });
 
     socket.on("c2s_msg", function (data) {
-      var { msg } = data;
+      let { msg } = data;
       if (MEMBER[socket.id] == null) return;
       if (msg.length > MAX_MSG_LENGTH) return;
       if (TOKENS[socket.id] != data.token) return;
       msg = xss(msg);
-      var minDist = MEMBER[socket.id].dist;
-      var sender = MEMBER[socket.id];
+      const noisedMsg = addNoise(msg);
+      const sender = MEMBER[socket.id];
+      const minDist = sender.dist;
       io.to(sender.room).emit("s2c_talking", {
         id: sender.count,
         dist: minDist,
       });
       Object.keys(MEMBER).forEach(function (key) {
-        var member = MEMBER[key];
-        var dist = calcDist(member.x, member.y, sender.x, sender.y);
-        if (dist < minDist && member.room == sender.room)
+        const member = MEMBER[key];
+        const dist = calcDist(member.x, member.y, sender.x, sender.y);
+        if (dist < minDist * 1.5 && member.room == sender.room)
           io.to(key).emit("s2c_msg", {
-            msg: msg,
+            msg: dist < minDist ? msg : noisedMsg,
             name: sender.input_name,
-            color: sender.color,
+            color: dist < minDist ? sender.color : "#BBB",
           });
       }, MEMBER);
     });
@@ -181,4 +182,17 @@ function genRandColor() {
   var color = `hsla(${hue}, 50%, ${sat}%, 1)`;
 
   return color;
+}
+
+function addNoise(msg) {
+  if (msg.length < 3) return "......";
+  const pos = randint(msg.length - 2, 1);
+  const len = randint(msg.length - pos, pos + 1);
+  console.log(pos, len);
+
+  return "......" + msg.slice(pos, len) + "......";
+}
+
+function randint(max, min = 0) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
