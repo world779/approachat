@@ -137,22 +137,13 @@ function randomAct() {
         sockets[i].emit("c2s_join", {
           token: NPC[i].token,
           room: roomName,
-          color: genRandColor(),
-          input_name: "",//genName(),
+          input_name: genName(),
           password: password,
         });
       }
     }
   }
   setTimeout(randomAct, interval);
-}
-
-function genRandColor() {
-  var hue = Math.floor(Math.random() * 10) * 36;
-  var sat = Math.floor(Math.random() * 40) + 25;
-  var color = `hsla(${hue}, 50%, ${sat}%, 1)`;
-
-  return color;
 }
 
 let decideMovement = () => Math.floor(Math.random() * 10);
