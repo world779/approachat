@@ -121,7 +121,6 @@ window.onload = function () {
       socket.emit("c2s_join", {
         token: IAM.token,
         room: roomName,
-        color: genRandColor(),
         input_name: input_name,
         password: pass,
       });
@@ -259,14 +258,6 @@ function adjustViewPoint(id = IAM.id) {
     scrollTop: y,
     scrollLeft: x,
   });
-}
-
-function genRandColor() {
-  var hue = Math.floor(Math.random() * 10) * 36;
-  var sat = Math.floor(Math.random() * 40) + 25;
-  var color = `hsla(${hue}, 50%, ${sat}%, 1)`;
-
-  return color;
 }
 
 function drawMsgRange(id, dist) {

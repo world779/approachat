@@ -75,20 +75,19 @@ module.exports = function (io) {
                   }
                   if (isMatch) {
                     io.to(socket.id).emit("initial_data", { data: MEMBER });
-                    MEMBER[socket.id].room = data.room;
-                    MEMBER[socket.id].color = data.color;
-                    MEMBER[socket.id].input_name = xss(data.input_name);
+                    const sender = MEMBER[socket.id];
+                    sender.room = data.room;
+                    sender.input_name = xss(data.input_name);
+                    sender.color = genRandColor();
                     socket.join(data.room);
-                    var x = Math.floor(Math.random() * 1000) + 2000;
-                    var y = Math.floor(Math.random() * 1000) + 2000;
-                    MEMBER[socket.id].x = x;
-                    MEMBER[socket.id].y = y;
-                    io.to(MEMBER[socket.id].room).emit("s2c_join", {
-                      id: MEMBER[socket.id].count,
-                      color: data.color,
-                      name: MEMBER[socket.id].input_name,
-                      x: x,
-                      y: y,
+                    sender.x = Math.floor(Math.random() * 1000) + 2000;
+                    sender.y = Math.floor(Math.random() * 1000) + 2000;
+                    io.to(sender.room).emit("s2c_join", {
+                      id: sender.count,
+                      color: sender.color,
+                      name: sender.input_name,
+                      x: sender.x,
+                      y: sender.y,
                       dist: MIN_DIST + MAX_DIST / 2,
                     });
                   } else {
@@ -174,4 +173,12 @@ module.exports = function (io) {
 
 function calcDist(x1, y1, x2, y2) {
   return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+}
+
+function genRandColor() {
+  var hue = Math.floor(Math.random() * 10) * 36;
+  var sat = Math.floor(Math.random() * 40) + 25;
+  var color = `hsla(${hue}, 50%, ${sat}%, 1)`;
+
+  return color;
 }
