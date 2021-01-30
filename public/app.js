@@ -284,11 +284,11 @@ function drawCurrentDist(id, dist) {
   anime({
     backgroundColor: "rgba(0, 0, 0, .02)",
     targets: effect,
-    height: dist,
-    width: dist,
-    borderRadius: dist / 2,
-    translateX: "+=fix",
-    translateY: "+=fix",
+    height: dist * 2,
+    width: dist * 2,
+    borderRadius: dist,
+    // translateX: "+=fix",
+    // translateY: "+=fix",
     easing: "linear",
   });
 }

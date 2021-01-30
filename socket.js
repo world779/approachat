@@ -5,7 +5,7 @@ const crypto = require("crypto");
 require("dotenv").config();
 
 const MIN_DIST = 50;
-const MAX_DIST = 500;
+const MAX_DIST = 300;
 const MAX_MSG_LENGTH = 2000;
 
 const { SECRET_TOKEN } = process.env;
@@ -137,6 +137,7 @@ module.exports = function (io) {
       if (dist > 100) dist = 100;
       dist = (dist * MAX_DIST) / 100 + MIN_DIST;
       MEMBER[socket.id].dist = dist;
+      console.log(dist);
       io.to(MEMBER[socket.id].room).emit("s2c_dist", {
         id: MEMBER[socket.id].count,
         dist: dist,
