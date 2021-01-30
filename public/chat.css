@@ -77,7 +77,6 @@
 }
 
 #welcome {
-  position: absolute;
   width: 700px;
   height: 700px;
   top: 2300px;
@@ -85,7 +84,6 @@
 }
 
 #building {
-  position: absolute;
   width: 1000px;
   height: 1000px;
   top: 800px;
@@ -93,7 +91,6 @@
 }
 
 #amusement-park {
-  position: absolute;
   width: 2000px;
   height: 2000px;
   top: -150px;
@@ -101,7 +98,6 @@
 }
 
 #home {
-  position: absolute;
   width: 800px;
   height: 800px;
   bottom: 100px;
@@ -109,14 +105,12 @@
 }
 
 #tree {
-  position: absolute;
   width: 600px;
   bottom: 1800px;
   right: 1000px;
 }
 
 #yacht {
-  position: absolute;
   width: 700px;
   height: 700px;
   bottom: 0px;
@@ -124,14 +118,19 @@
 }
 
 #camp {
-  position: absolute;
   width: 700px;
   height: 700px;
   left: 1200px;
   bottom: 1200px;
 }
 
-::-webkit-scrollbar {  /* Chrome, Safari 対応 */
+img {
+  position: absolute;
+  z-index: 1;
+  user-select: none;
+}
+
+::-webkit-scrollbar {
   display:none;
 }
 
