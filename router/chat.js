@@ -1,4 +1,5 @@
 var router = require("express").Router();
+const xss = require("xss");
 
 const { pool, DB_ROOM_TABLE, DB_ROOM_NAME_COLUMN } = require("../dbConfig.js");
 const { DOCUMENT_ROOT } = require("../serve.js");
@@ -16,7 +17,7 @@ router.get("/room/*", async (req, res) => {
     )
   )
     res.sendFile(DOCUMENT_ROOT + "/chat.html");
-  else res.send(`"${roomName}"という名前の部屋は登録されていません`);
+  else res.send(`"${xss(roomName)}"という名前の部屋は登録されていません`);
 });
 
 router.get("/new", commonFuncs.checkNotAutheticated, (req, res) => {
