@@ -6,7 +6,8 @@ const bcrypt = require("bcrypt");
 const commonFuncs = require("../commonFuncs.js");
 
 router.get("/room/*", async (req, res) => {
-  const roomName = req.url.slice(6);
+  const roomName = decodeURI(req.url.slice(6));
+  console.log(req.user);
   if (
     await commonFuncs.checkExistence(
       DB_ROOM_TABLE,

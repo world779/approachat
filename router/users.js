@@ -32,12 +32,12 @@ router.get("/logout", (req, res) => {
 router.post("/register", async (req, res) => {
   const { name, email, password, password2 } = req.body;
 
-  console.log({
-    name,
-    email,
-    password,
-    password2,
-  });
+  // console.log({
+  //   name,
+  //   email,
+  //   password,
+  //   password2,
+  // });
 
   const errors = [];
 
@@ -57,7 +57,6 @@ router.post("/register", async (req, res) => {
     res.render("register", { errors });
   } else {
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log(hashedPassword);
     if (
       await commonFuncs.checkExistence(
         DB_USER_TABLE,
@@ -77,7 +76,6 @@ router.post("/register", async (req, res) => {
           if (err) {
             throw err;
           }
-          console.log(results.rows);
           req.flash(
             "success_msg",
             "登録が完了しました。ログインしてください。"
@@ -107,7 +105,7 @@ function getRoomList(req, res, loadDashboard) {
         throw err;
       }
       const roomList = results.rows;
-      console.log(roomList);
+      // console.log(roomList);
       loadDashboard(req, res, roomList);
     }
   );
