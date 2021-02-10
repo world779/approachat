@@ -132,6 +132,29 @@ module.exports = function (io) {
       }, MEMBER);
     });
 
+    socket.on("c2s_msg_all", function (data) {
+      var { msg } = data;
+      if (MEMBER[socket.id] == null) return;
+      if (msg.length > MAX_MSG_LENGTH) return;
+      if (TOKENS[socket.id] != data.token) return;
+      msg = xss(msg);
+      var minDist = MEMBER[socket.id].dist;
+      var sender = MEMBER[socket.id];
+      io.to(sender.room).emit("s2c_talking", {
+        id: sender.count,
+        dist: minDist,
+      });
+      Object.keys(MEMBER).forEach(function (key) {
+        var member = MEMBER[key];
+        if (member.room == sender.room)
+          io.to(key).emit("s2c_msg", {
+            msg: "(全体へのアナウンス)" + msg,
+            name: sender.input_name,
+            color: sender.color,
+          });
+      }, MEMBER);
+    });
+
     socket.on("c2s_dist", function (data) {
       if (TOKENS[socket.id] != data.token) return;
       var { dist } = data;

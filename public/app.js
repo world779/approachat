@@ -8,6 +8,8 @@ const IAM = {
   isMoving: false,
 };
 
+const MIN_DIST = 50;
+const MAX_DIST = 500;
 const MAX_MSG_LENGTH = 2000;
 
 var utilIsOpen = true;
@@ -105,12 +107,20 @@ window.onload = function () {
   var roomName = url.replace("/chat/room/", "");
   $("#passLabel").text(`"${roomName}"のパスワード`);
 
+  $('form').append('<input name="key" type="hidden" value="" />');
+        $('button').click(function(){
+            $('input[name=key]').val($(this).val());
+        });
   $("form").submit(function (e) {
     if (IAM.isEnter) {
       // メッセージを送る
       var message = $("#msgForm").val();
       var dist = $("#dist").val();
-      socket.emit("c2s_msg", { token: IAM.token, dist: dist, msg: message });
+      if($('input[name=key]').val() == 'sendAll'){
+        socket.emit("c2s_msg_all", { token: IAM.token, dist: dist, msg: message });
+      } else {
+        socket.emit("c2s_msg", { token: IAM.token, dist: dist, msg: message });
+      }
       $("#msgForm").val("");
       $("#msgForm").trigger("send");
     } else {
