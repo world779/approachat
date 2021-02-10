@@ -59,6 +59,35 @@
   position: absolute;
   z-index: 1;
 }
+.avatar-speechBubble {
+  position: absolute;
+  left: 30px;
+  bottom: 30px;
+  display: inline-block;
+  margin: 1.5em 0;
+  padding: 17px 10px;
+  min-width: 200px;
+  max-width: 100%;
+  border-radius: 10px;
+  color: #fff;
+  word-break: break-all;
+  z-index: 2;
+  font-size: 16px;
+}
+.avatar-speechBubble:before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 20%;
+  border: 15px solid transparent;
+  border-top: 15px solid;
+}
+.avatar-speechBubble p {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  color: #fff;
+}
 
 #namebar {
   position: fixed;
@@ -131,7 +160,7 @@ img {
 }
 
 ::-webkit-scrollbar {
-  display:none;
+  display: none;
 }
 
 #carousel {

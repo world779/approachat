@@ -20,11 +20,11 @@ var socket = io.connect({
 });
 
 socket.on("s2c_msg", function (data) {
-  appendMsg(data.msg, data.name, data.color);
+  appendMsg(data.id, data.msg, data.name, data.color);
 });
 
 socket.on("s2c_leave", function (data) {
-  appendMsg(`退出しました`, data.name, data.color);
+  appendMsg(data.id, `退出しました`, data.name, data.color);
   $(`#${data.id}`).remove();
   removeList(data.id);
 });
@@ -64,7 +64,7 @@ URL: ${location.href}
 });
 
 socket.on("s2c_join", function (data) {
-  appendMsg("入室しました", data.name, data.color);
+  appendMsg(data.id, "入室しました", data.name, data.color);
   appendAvatar(data.id, data.color, data.name);
   drawCurrentDist(data.id, data.dist);
   $(`.${data.id}`).css(
@@ -182,10 +182,13 @@ window.onbeforeunload = function () {
 
 function appendAvatar(id, color, input_name) {
   $("#field").append(
-    `<div id=${id} class="avatar ${id}">${input_name}<div id=${id}-effect class="avatar-effect"></div></div>`
+    `<div id=${id} class="avatar ${id}">${input_name}<div id=${id}-effect class="avatar-effect"></div><div id=${id}-speechBubble class="avatar-speechBubble" ${id}></div></div>`
   );
+  // $("#field").append(` <div id="chatLogs" class="avatar>こんにちは</div>`);
   $(`#${id}`).css("background-color", color);
   $(`#${id}-effect`).css("border", "1px solid " + color);
+  $(`#${id}-speechBubble`).css("background-color", color);
+  // $(`#${id}-speechBubble:before`).css("background-color", color);
   $("#name-list").append(
     `<li id="${id}-name" class="name" onclick="adjustViewPoint(${id})" style="color: ${color};">${input_name}</li>`
   );
@@ -199,10 +202,16 @@ function removeList(id) {
   $(`#name-list > #${id}-name`).remove();
 }
 
-function appendMsg(text, name, color) {
+function appendMsg(id, text, name, color) {
+  removeSpeechBubble(id);
   $("#chatLogs").append(`<div style="color: ${color};">${name}: ${text}</div>`);
+  $(`#${id}-speechBubble`).append(`<p">${text}</p>`);
   var log = document.getElementById("chatLogs");
   log.scrollTop = log.scrollHeight;
+}
+
+function removeSpeechBubble(id) {
+  $(`#${id}-speechBubble`).children().remove();
 }
 
 function toggleUtil() {
