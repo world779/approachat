@@ -125,6 +125,7 @@ module.exports = function (io) {
         const dist = calcDist(member.x, member.y, sender.x, sender.y);
         if (dist < minDist * 1.5 && member.room == sender.room)
           io.to(key).emit("s2c_msg", {
+            id: sender.count,
             msg: dist < minDist ? msg : noisedMsg,
             name: sender.input_name,
             color: dist < minDist ? sender.color : "#BBB",

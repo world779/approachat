@@ -182,7 +182,7 @@ window.onbeforeunload = function () {
 
 function appendAvatar(id, color, input_name) {
   $("#field").append(
-    `<div id=${id} class="avatar ${id}">${input_name}<div id=${id}-effect class="avatar-effect"></div><div id=${id}-speechBubble class="avatar-speechBubble" ${id}></div></div>`
+    `<div id=${id} class="avatar ${id}">${input_name}<div id=${id}-effect class="avatar-effect"></div><div id=${id}-speechBubble class="avatar-speechBubble"></div></div>`
   );
   // $("#field").append(` <div id="chatLogs" class="avatar>こんにちは</div>`);
   $(`#${id}`).css("background-color", color);
@@ -203,15 +203,10 @@ function removeList(id) {
 }
 
 function appendMsg(id, text, name, color) {
-  removeSpeechBubble(id);
   $("#chatLogs").append(`<div style="color: ${color};">${name}: ${text}</div>`);
-  $(`#${id}-speechBubble`).append(`<p">${text}</p>`);
+  $(`#${id}-speechBubble`).text(text);
   var log = document.getElementById("chatLogs");
   log.scrollTop = log.scrollHeight;
-}
-
-function removeSpeechBubble(id) {
-  $(`#${id}-speechBubble`).children().remove();
 }
 
 function toggleUtil() {
